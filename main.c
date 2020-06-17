@@ -31,13 +31,14 @@ int main(int argc, char *argv[])
     printf("hola\n");
     uint32_t seed = 0;
     uint32_t hash = murmurhash(key,(uint32_t)strlen(key),seed);
-    printf("Hasheado1: %u \n",hash);
+    printf("Hasheado1: %u y aplicado el modulo es: %u \n",hash, hash % 13);
 
     uint32_t hash1 = murmurhash("Hola",(uint32_t)strlen(key),seed);
-    printf("Hasheado2: %u \n",hash1);
+    printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash1, hash1 % 13);
 
     uint32_t hash2 = murmurhash("Arturo Javier Aguilar Lopez",(uint32_t)strlen(key),seed);
-    printf("Hasheado2: %u \n",hash2);
+    printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash2, hash2 % 13);
+
 
 
     return failure_count() > 0;
