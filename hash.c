@@ -22,8 +22,8 @@ typedef struct{
 }hash_campo_t;
 
 struct hash{
-    size_t cantidad;
-    size_t capacidad;
+    size_t cant;
+    size_t tam;
     size_t carga;
     hash_campo_t *tabla;
     hash_destruir_dato_t destruir_dato;
@@ -37,8 +37,8 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t * hash = malloc(sizeof(hash_t));
     if(!hash)   return NULL;
 
-    hash->capacidad = TAM_HASH_INICIAL;
-    hash->cantidad = 0;
+    hash->tam = TAM_HASH_INICIAL;
+    hash->cant = 0;
 
 
     return hash;
