@@ -30,15 +30,18 @@ struct hash{
 };
 
 struct hash_iter{
-
+    hash_t* hash;
+    hash_campo_t actual;
+    size_t posicion;
 };
 
-hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
-    hash_t * hash = malloc(sizeof(hash_t));
+hash_t* hash_crear(hash_destruir_dato_t destruir_dato){
+    hash_t* hash = malloc(sizeof(hash_t));
     if(!hash)   return NULL;
 
     hash->tam = TAM_HASH_INICIAL;
     hash->cant = 0;
+    hash->destruir_dato = destruir_dato;
 
 
     return hash;
