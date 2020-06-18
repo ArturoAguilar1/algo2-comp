@@ -17,3 +17,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     return hash;
 }
 
+bool hash_guardar(hash_t *hash, const char *clave, void *dato){
+
+	
+}
