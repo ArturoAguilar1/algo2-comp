@@ -6,9 +6,9 @@
 typedef enum{
     VACIO = 0,
     OCUPADO = 1,
-    
-}estado_t;
 
+}estado_t;
+//Probando probando 
 struct hash{
     size_t cantidad;
     size_t capacidad;
