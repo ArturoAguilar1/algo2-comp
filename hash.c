@@ -20,7 +20,6 @@ typedef enum{
 }estado_t;
 
 typedef struct{
-
     char *clave;
     void *dato;
     estado_t estado;
@@ -31,6 +30,12 @@ struct hash{
     size_t tam;
     hash_campo_t *tabla;
     hash_destruir_dato_t destruir_hash_dato;
+};
+
+struct hash_iter{
+    hash_t* hash;
+    hash_campo_t actual;
+    size_t posicion;
 };
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
