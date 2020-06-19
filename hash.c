@@ -70,9 +70,9 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	//Quiero guardar la misma clave, hago el caso borde.
 
 	//else if(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO) Al pedo este if porque si encuentro uno vacio nunca va a entrar en el while (19/06)
-	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice.estado == OCUPADO]){
+	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice.estado == BORRADO]){
 		indice++;
-		if(indice == hash->tam) //Esto lo saqué del hash cerrado
+		if(indice >= hash->tam) //Esto lo saqué del hash cerrado
 			indice = 0;
 	}
 	
@@ -83,7 +83,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
 	hash->tabla[indice].dato = dato;
 	hash->tabla[indice].estado = OCUPADO;
-
+	hash->cant++;
 
 	return true;
 
@@ -97,7 +97,74 @@ void *hash_borrar(hash_t *hash, const char *clave){
 	return NULL;
 }
 
+void *hash_obtener(const hash_t *hash, const char *clave){
 
+		int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
+
+	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
+		while(hash->tabla[indice].estado == BORRADO){
+			indice++;
+			if(indice >= hash->tam)
+				indice = 0;
+		}
+		
+		if(!strcmp(hash->tabla[indice].clave,clave))
+			break;
+			
+		indice++;
+	
+		if(indice >= hash->tam)
+			indice = 0;
+			
+	}
+	
+	if(hash->tabla[indice].estado == VACIO)
+		return NULL;
+
+	return hash->tabla[indice].dato;
+}
+
+bool hash_pertenece(const hash_t *hash, const char *clave){
+
+	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
+
+	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
+		while(hash->tabla[indice].estado == BORRADO){
+			indice++;
+			if(indice >= hash->tam)
+				indice = 0;
+		}
+		
+		if(!strcmp(hash->tabla[indice].clave,clave))
+			break;
+			
+		indice++;
+	
+		if(indice >= hash->tam)
+			indice = 0;
+			
+	}
+	
+
+	if(hash->tabla[indice].estado == VACIO)
+		return false;
+
+	return true;
+}
+
+
+
+void hash_destruir(hash_t *hash){
+
+	for(size_t i=0;i<hash->tam;i++){
+		if(hash->tabla[indice].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
+			hash->destruir_hash_dato(hash->tabla[i].dato);
+			hash->destruir_hash_dato(hash->tabla[i].clave);
+		}
+	}
+	free(hash->tabla);
+	free(hash);
+}
 
 
 
