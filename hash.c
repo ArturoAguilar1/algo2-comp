@@ -6,6 +6,7 @@
 
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 13
+#define FACTOR_DE_CARGA 0.7
 
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
@@ -35,7 +36,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
     if(!hash)   
     	return NULL;
-	hash->tabla = malloc(sizeof(hash_campo_t)*TAM_HASH_INICIAL;
+	hash->tabla = malloc(sizeof(hash_campo_t)*TAM_HASH_INICIAL);
     if(!hash->tabla){
     	free(hash);
     	return NULL;
@@ -51,16 +52,16 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     return hash;
 }
 
+hash_t * hash_redimensionar(hash_t * nuevo, const hash_t *viejo){
+	hash_t *hash = malloc(sizeof(hash_campo_t));
+	if(!hash)
+		return NULL;
+	hash->tabla = malloc()
+
+}
+
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	uint32_t seed = 0;
-	hash_campo_t *campo = malloc(sizeof(hash_campo_t));
-	if(!campo)
-		return false;
-
-	char *copia = strdup(clave); 
-	campo->clave = copia;
-	campo->dato = dato;
-	campo->estado = OCUPADO;
 
 	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
 	
@@ -68,16 +69,20 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		hash->destruir_hash_dato(hash->tabla[indice].dato); 
 	//Quiero guardar la misma clave, hago el caso borde.
 
-	else if(hash->tabla[indice].estado == OCUPADO){
-		while(hash->tabla[indice].estado == LIBRE){
-			indice++;
-			if(indice == hash->tam) //Esto lo saqué del hash cerrado
-				indice = 0;
-		}
+	//else if(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO) Al pedo este if porque si encuentro uno vacio nunca va a entrar en el while (19/06)
+	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice.estado == OCUPADO]){
+		indice++;
+		if(indice == hash->tam) //Esto lo saqué del hash cerrado
+			indice = 0;
 	}
+	
 	//Falta ver lo del tema de redimensionar si completamos una cierta cantidad.
-
-	hash->tabla[indice] = *campo;
+	if((double)(hash->cantidad / hash->capacidad) >= FACTOR_DE_CARGA){
+	}
+	
+	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
+	hash->tabla[indice].dato = dato;
+	hash->tabla[indice].estado = OCUPADO;
 
 
 	return true;
