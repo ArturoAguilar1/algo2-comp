@@ -1,8 +1,11 @@
 #include "testing.h"
 #include <stdlib.h>
 #include <stdio.h>
+
 #include <stdint.h>
 #include <string.h>
+
+#define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
 /* ******************************************************************
  *                        PROGRAMA PRINCIPAL
@@ -13,6 +16,7 @@ void pruebas_volumen_catedra(size_t);
 
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
+uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
 
 int main(int argc, char *argv[])
 {
@@ -27,18 +31,33 @@ int main(int argc, char *argv[])
     // printf("\n~~~ PRUEBAS CÁTEDRA ~~~\n");
     // pruebas_hash_catedra();
     printf("Prueba con funcion hash:\n");
-    const char *key = "hola";
-    printf("hola\n");
-    uint32_t seed = 0;
-    uint32_t hash = murmurhash(key,(uint32_t)strlen(key),seed);
-    printf("Hasheado1: %u y aplicado el modulo es: %u \n",hash, hash % 13);
+    // const char *key = "hola";
+    // printf("hola\n");
+    // uint32_t seed = 0;
+    // uint32_t hash = murmurhash(key,(uint32_t)strlen(key),seed);
+    // printf("Hasheado1: %u y aplicado el modulo es: %u \n",hash, hash % 13);
 
-    uint32_t hash1 = murmurhash("Hola",(uint32_t)strlen(key),seed);
-    printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash1, hash1 % 13);
+    // uint32_t hash1 = murmurhash("Hola",(uint32_t)strlen(key),seed);
+    // printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash1, hash1 % 13);
 
-    uint32_t hash2 = murmurhash("Arturo Javier Aguilar Lopez",(uint32_t)strlen(key),seed);
-    printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash2, hash2 % 13);
+    // uint32_t hash2 = murmurhash("Arturo Javier Aguilar Lopez",(uint32_t)strlen(key),seed);
+    // printf("Hasheado2: %u y aplicado el modulo es: %u \n",hash2, hash2 % 13);
 
+    const char *key1 = "Salchichon Primavera";
+    const char *key2 = "Algoritmos 2";
+    const char *key3 = "Probando Diccionario"; 
+
+    uint32_t hpip = FNV1A_Pippip("Arturo Javier Aguilar Lopez",strlen("Arturo Javier Aguilar Lopez"));
+    printf("Hasheado2: %u y aplicado el modulo es: %u \n",hpip, hpip % 13);
+
+    uint32_t hpip1 = FNV1A_Pippip(key1,strlen(key1));
+    printf("String: %s   Hasheado: %u    Con mod: %u   \n",key1,hpip1, hpip1 % 13);
+
+      uint32_t hpip2 = FNV1A_Pippip(key2,strlen(key2));
+    printf("String: %s   Hasheado: %u    Con mod: %u   \n",key2,hpip2, hpip2 % 13);
+
+    uint32_t hpip3 = FNV1A_Pippip(key1,strlen(key3));
+    printf("String: %s   Hasheado: %u    Con mod: %u   \n",key3,hpip3, hpip3 % 13);
 
 
     return failure_count() > 0;
@@ -107,3 +126,26 @@ uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed) {
   return h;
 }
 
+
+/*La encontre en: https://www.codeproject.com/Articles/716530/Fastest-Hash-Function-for-Table-Lookups-in-C
+Ahi explica que tiene muy buen rendimiento comparado a otras.
+Necesita la macro de funcion _PaDr_KAZE
+*/
+uint32_t FNV1A_Pippip(const char *str, size_t wrdlen) {
+	const uint32_t PRIME = 591798841; 
+  uint32_t hash32; 
+  uint64_t hash64 = 14695981039346656037U;
+	size_t Cycles, NDhead;
+  if (wrdlen > 8) {
+	Cycles = ((wrdlen - 1)>>4) + 1; NDhead = wrdlen - (Cycles<<3);
+  #pragma nounroll
+        for(; Cycles--; str += 8) {
+		hash64 = ( hash64 ^ (*(uint64_t *)(str)) ) * PRIME;        
+		hash64 = ( hash64 ^ (*(uint64_t *)(str+NDhead)) ) * PRIME;        
+	}
+} else
+	hash64 = ( hash64 ^ _PADr_KAZE(*(uint64_t *)(str+0), (8-wrdlen)<<3) ) * PRIME;        
+  hash32 = (uint32_t)(hash64 ^ (hash64>>32)); 
+
+return hash32 ^ (hash32 >> 16);
+} 
