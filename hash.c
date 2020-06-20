@@ -128,18 +128,20 @@ void *hash_borrar(hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
 	void *dato;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		if(strcmp(hash->tabla[indice].clave,clave) == 0){
+		if(hash->tabla[indice].estado == BORRADO){
+			indice++;
+			if(indice == hash->tam)
+				indice = 0;	
+			continue;
+		}
+		if(!strcmp(hash->tabla[indice].clave,clave)){
 			dato = hash->tabla[indice].dato;
 			//Una vez encontrado el dato, hay que liberar la memoria asociada a la clave, ya que la pedimos en strdup
 			free(hash->tabla[indice].clave);
 			hash->tabla[indice].estado = BORRADO;
 			return dato;
-		}else if(hash->tabla[indice].estado == LIBRE){
-			//creo que no entraria nunca aca, porque si el estado es libre se rompe el while, je
-			break;
 		}
 		indice++;
-
 		if(indice == hash->tam)
 			indice = 0;	
 	}
@@ -151,7 +153,7 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	void *dato;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		if(strcmp(hash->tabla[indice].clave,clave) == 0){
+		if(!strcmp(hash->tabla[indice].clave,clave)){
 			dato = hash->tabla[indice].dato;
 			return dato;
 		}
