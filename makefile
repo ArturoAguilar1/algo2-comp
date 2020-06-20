@@ -1,5 +1,5 @@
 EXEC = hash
-CFILES = hash.c  testing.c main.c
+CFILES = hash.c  testing.c main.c hash_pruebas.c
 HFILES = hash.h testing.h 
 
 CC = gcc

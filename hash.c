@@ -226,17 +226,16 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 		return NULL;
 	iter->hash = hash;
 	iter->posicion = 0;
-	printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
 	//Hay que ver que pasa si la cantidad del hash es 0.
 	//Busco hasta el primer ocupado
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
 	//printf("Entré con %lu\n",iter->posicion);
 		if(iter->posicion == hash->cant){
-			iter->posicion = iter->hash->cant;
-			return iter;
+			break;
 		}
 		iter->posicion++;
 	}
+	printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
 
 	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;

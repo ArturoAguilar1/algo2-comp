@@ -20,6 +20,19 @@ void pruebas_volumen_catedra(size_t);
 
 int main(int argc, char *argv[])
 {
+    if (argc > 1) {
+        // Asumimos que nos están pidiendo pruebas de volumen.
+        long largo = strtol(argv[1], NULL, 10);
+        pruebas_volumen_catedra((size_t) largo);
+
+        return failure_count() > 0;
+    }
+
+    printf("\n~~~ PRUEBAS CÁTEDRA ~~~\n");
+    pruebas_hash_catedra();
+
+    return failure_count() > 0;
+}
     // if (argc > 1) {
     //     // Asumimos que nos están pidiendo pruebas de volumen.
     //     long largo = strtol(argv[1], NULL, 10);
@@ -60,8 +73,8 @@ int main(int argc, char *argv[])
     // printf("String: %s   Hasheado: %u    Con mod: %u   \n",key3,hpip3, hpip3 % 13);
 
 
-    return failure_count() > 0;
-}
+    //return failure_count() > 0;
+
 
 
 // uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed) {
