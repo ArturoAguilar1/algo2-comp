@@ -18,7 +18,7 @@
  *                        PRUEBAS UNITARIAS
  * *****************************************************************/
 
-static void prueba_crear_hash_vacio()
+void prueba_crear_hash_vacio()
 {
     hash_t* hash = hash_crear(NULL);
 
@@ -400,9 +400,9 @@ void prueba_iterar_hash_vacio()
 void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    prueba_crear_hash_vacio();
-    prueba_iterar_hash_vacio();
-    prueba_hash_insertar();
+    //prueba_crear_hash_vacio(); //OK
+    //prueba_iterar_hash_vacio(); //OK
+    //prueba_hash_insertar(); //OK
     // prueba_hash_reemplazar();
     // prueba_hash_reemplazar_con_destruir();
     // prueba_hash_borrar();
