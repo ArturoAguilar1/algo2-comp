@@ -3,13 +3,14 @@
 #include <stdint.h>
 #include <string.h>
 #include "hash.h"
+#define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 13
 #define FACTOR_DE_CARGA 0.7
 #define TABLA_INICIO 0
 
-uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
+// uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
 
 typedef enum{
@@ -19,7 +20,6 @@ typedef enum{
 }estado_t;
 
 typedef struct{
-
     char *clave;
     void *dato;
     estado_t estado;
@@ -32,6 +32,7 @@ struct hash{
     hash_destruir_dato_t destruir_hash_dato;
 };
 
+<<<<<<< HEAD
 struct hast_iter{
 	hash_t* hash;
 	hash_campo_t actual;
@@ -40,6 +41,14 @@ struct hast_iter{
 
 
 
+=======
+struct hash_iter{
+    hash_t* hash;
+    hash_campo_t actual;
+    size_t posicion;
+};
+
+>>>>>>> 68a80265acd51096341f3b1dee1e3fddf5c5b0ab
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
     if(!hash)   
@@ -49,7 +58,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     	free(hash);
     	return NULL;
     }
-		
+
     hash->tam = TAM_HASH_INICIAL;
     hash->cant = 0;
     hash->destruir_hash_dato = destruir_dato;
@@ -209,68 +218,67 @@ void hash_iter_destruir(hash_iter_t* iter){
 
 //Funcion de hash: Murmurhash3 de:
 // https://github.com/jwerle/murmurhash.c/blob/master/murmurhash.c
+// uint32_t murmurhash(const char *key, uint32_t len, uint32_t seed) {
+//   uint32_t c1 = 0xcc9e2d51;
+//   uint32_t c2 = 0x1b873593;
+//   uint32_t r1 = 15;
+//   uint32_t r2 = 13;
+//   uint32_t m = 5;
+//   uint32_t n = 0xe6546b64;
+//   uint32_t h = 0;
+//   uint32_t k = 0;
+//   uint8_t *d = (uint8_t *) key; // 32 bit extract from `key'
+//   const uint32_t *chunks = NULL;
+//   const uint8_t *tail = NULL; // tail - last 8 bytes
+//   int i = 0;
+//   int l = len / 4; // chunk length
 
-uint32_t murmurhash(const char *key, uint32_t len, uint32_t seed) {
-  uint32_t c1 = 0xcc9e2d51;
-  uint32_t c2 = 0x1b873593;
-  uint32_t r1 = 15;
-  uint32_t r2 = 13;
-  uint32_t m = 5;
-  uint32_t n = 0xe6546b64;
-  uint32_t h = 0;
-  uint32_t k = 0;
-  uint8_t *d = (uint8_t *) key; // 32 bit extract from `key'
-  const uint32_t *chunks = NULL;
-  const uint8_t *tail = NULL; // tail - last 8 bytes
-  int i = 0;
-  int l = len / 4; // chunk length
+//   h = seed;
 
-  h = seed;
+//   chunks = (const uint32_t *) (d + l * 4); // body
+//   tail = (const uint8_t *) (d + l * 4); // last 8 byte chunk of `key'
 
-  chunks = (const uint32_t *) (d + l * 4); // body
-  tail = (const uint8_t *) (d + l * 4); // last 8 byte chunk of `key'
+//   // for each 4 byte chunk of `key'
+//   for (i = -l; i != 0; ++i) {
+//     // next 4 byte chunk of `key'
+//     k = chunks[i];
 
-  // for each 4 byte chunk of `key'
-  for (i = -l; i != 0; ++i) {
-    // next 4 byte chunk of `key'
-    k = chunks[i];
+//     // encode next 4 byte chunk of `key'
+//     k *= c1;
+//     k = (k << r1) | (k >> (32 - r1));
+//     k *= c2;
 
-    // encode next 4 byte chunk of `key'
-    k *= c1;
-    k = (k << r1) | (k >> (32 - r1));
-    k *= c2;
+//     // append to hash
+//     h ^= k;
+//     h = (h << r2) | (h >> (32 - r2));
+//     h = h * m + n;
+//   }
 
-    // append to hash
-    h ^= k;
-    h = (h << r2) | (h >> (32 - r2));
-    h = h * m + n;
-  }
+//   k = 0;
 
-  k = 0;
+//   // remainder
+//   switch (len & 3) { // `len % 4'
+//     case 3: k ^= (tail[2] << 16);
+//     case 2: k ^= (tail[1] << 8);
 
-  // remainder
-  switch (len & 3) { // `len % 4'
-    case 3: k ^= (tail[2] << 16);
-    case 2: k ^= (tail[1] << 8);
+//     case 1:
+//       k ^= tail[0];
+//       k *= c1;
+//       k = (k << r1) | (k >> (32 - r1));
+//       k *= c2;
+//       h ^= k;
+//   }
 
-    case 1:
-      k ^= tail[0];
-      k *= c1;
-      k = (k << r1) | (k >> (32 - r1));
-      k *= c2;
-      h ^= k;
-  }
+//   h ^= len;
 
-  h ^= len;
+//   h ^= (h >> 16);
+//   h *= 0x85ebca6b;
+//   h ^= (h >> 13);
+//   h *= 0xc2b2ae35;
+//   h ^= (h >> 16);
 
-  h ^= (h >> 16);
-  h *= 0x85ebca6b;
-  h ^= (h >> 13);
-  h *= 0xc2b2ae35;
-  h ^= (h >> 16);
-
-  return h;
-}
+//   return h;
+// }
 
 /*La encontre en: https://www.codeproject.com/Articles/716530/Fastest-Hash-Function-for-Table-Lookups-in-C
 Ahi explica que tiene muy buen rendimiento comparado a otras.
