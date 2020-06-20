@@ -15,7 +15,7 @@
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 //uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
 
-static uint32_t seed = 0;
+static uint32_t seed_parametro = 0;
 
 typedef enum{
     LIBRE = 0,
@@ -36,7 +36,8 @@ struct hash{
     hash_destruir_dato_t destruir_hash_dato;
 };
 struct hash_iter{
-	hash_t *hash;
+	//Const porque la funcion por la catedra recibe const entonces el compilador jode con eso
+	const hash_t *hash;
 	hash_campo_t actual;
 	size_t posicion;
 };
@@ -56,21 +57,22 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash->destruir_hash_dato = destruir_dato;
 
     for(size_t i=0;i<hash->tam;i++)
-    	hash->tabla[i].estado = LIBRE; //Deberiamos dejar esto? siempre va a quedar O(13) pero como son siempre 13 elementos al final es O(1)
+    	hash->tabla[i].estado = LIBRE;
 
     return hash;
 }
 
-hash_t *hash_redimensionar(hash_t * nuevo, const hash_t *viejo){
-	hash_t *hash = malloc(sizeof(hash_campo_t));
-	if(!hash)
-		return NULL;
+bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
+	// hash_t *hash = malloc(sizeof(hash_campo_t));
+	// if(!hash)
+	// 	return NULL;
+	return true;
 	//hash->tabla = malloc()
 }
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 
-	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
+	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	
 	if(!strcmp(hash->tabla[indice].clave,clave)) //En esta parte no se si hay que borrar algo mas, la clave asumo que se encargaría barbara de borrarla, por lo tanto a nosotros no nos debería importar borrar la clave. 
 		hash->destruir_hash_dato(hash->tabla[indice].dato); 
@@ -103,8 +105,8 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 			if(hash->tabla[i].estado == OCUPADO)
 				hash_guardar(nuevo,hash->tabla[i].clave,hash->tabla[i].dato);
 
-		return nuevo;	
 		}
+		return nuevo;	
 	}
 	
 	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
@@ -120,53 +122,72 @@ size_t hash_cantidad(const hash_t *hash){
 	return hash->cant;
 }
 
+//Creo que al borrar no se deberia actualizar la cantidad, porque cuando redimensionamos contamos el borrado como si esruviera ocupado
+// ya que al borrado no se le pueden guardar claves
 void *hash_borrar(hash_t *hash, const char *clave){
-	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash->tam;
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
 	void *dato;
-	while(hash->tabla[indice].estado == OCUPADO){
+	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		if(strcmp(hash->tabla[indice].clave,clave) == 0){
 			dato = hash->tabla[indice].dato;
 			//Una vez encontrado el dato, hay que liberar la memoria asociada a la clave, ya que la pedimos en strdup
 			free(hash->tabla[indice].clave);
 			hash->tabla[indice].estado = BORRADO;
 			return dato;
+		}else if(hash->tabla[indice].estado == LIBRE){
+			//creo que no entraria nunca aca, porque si el estado es libre se rompe el while, je
+			break;
 		}
 		indice++;
+
+		if(indice == hash->tam)
+			indice = 0;	
 	}
-	
+
 	return NULL;
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
-
-		int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
-
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
+	void *dato;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		while(hash->tabla[indice].estado == BORRADO){
-			indice++;
-			if(indice >= hash->tam)
-				indice = 0;
+		if(strcmp(hash->tabla[indice].clave,clave) == 0){
+			dato = hash->tabla[indice].dato;
+			return dato;
 		}
+		indice++;
+
+		// while(hash->tabla[indice].estado == BORRADO){
+		// 	indice++;
+		// 	if(indice >= hash->tam)
+		// 		indice = 0;
+		// }
 		
-		if(!strcmp(hash->tabla[indice].clave,clave))
-			break;
+		// if(!strcmp(hash->tabla[indice].clave,clave))
+		// 	break;
 			
 		indice++;
 	
-		if(indice >= hash->tam)
+		if(indice == hash->tam)
 			indice = 0;
 			
 	}
 	
-	if(hash->tabla[indice].estado == LIBRE)
-		return NULL;
+	// if(hash->tabla[indice].estado == LIBRE)
+	// 	return NULL;
 
-	return hash->tabla[indice].dato;
+	return NULL;
 }
 
-bool hash_pertenece(const hash_t *hash, const char *clave){
 
-	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed) % hash -> tam;
+//Si te parecen los cambios que hice a obtener, tambien los implementamos aca en pertence
+//Tenemos que despues hacerlo en una funcion "buscar"
+bool hash_pertenece(const hash_t *hash, const char *clave){
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
+
+	if(strcmp(hash->tabla[indice].clave,clave) == 0 && hash->tabla[indice].estado == OCUPADO){
+
+	}
 
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		while(hash->tabla[indice].estado == BORRADO){
@@ -192,19 +213,16 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 	return true;
 }
 
-
-
-// void hash_destruir(hash_t *hash){
-
-// 	for(size_t i=0;i<hash->tam;i++){
-// 		if(hash->tabla[indice].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
-// 			hash->destruir_hash_dato(hash->tabla[i].dato);
-// 			hash->destruir_hash_dato(hash->tabla[i].clave);
-// 		}
-// 	}
-// 	free(hash->tabla);
-// 	free(hash);
-// }
+void hash_destruir(hash_t *hash){
+	for(size_t i=0 ; i<hash->tam; i++){
+		if(hash->tabla[i].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
+			hash->destruir_hash_dato(hash->tabla[i].dato);
+			hash->destruir_hash_dato(hash->tabla[i].clave);
+		}
+	}
+	free(hash->tabla);
+	free(hash);
+}
 
 hash_iter_t *hash_iter_crear(const hash_t *hash){
 	hash_iter_t *iter = malloc(sizeof(hash_iter_t));
@@ -212,24 +230,30 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 
 	iter->hash = hash;
 	iter->posicion = 0;
-	//Esto no seria asi porque si en la primera posicion tener un borrado u ocupado no puede estar
-	//ahi el iterador actual
-	iter->actual = hash->tabla[TABLA_INICIO];
-	
 
+	//Busco hasta el primer ocupado
+	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
+		iter->posicion++;
+	}
+	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;
 }
 
 bool hash_iter_avanzar(hash_iter_t *iter){
-	if(hash_iter_al_final(iter))
-		return false;
-	iter->posicion++;
+	// if(hash_iter_al_final(iter))
+	// 		return false;
+	//Hay que buscar la proxima posicion donde realmente haya un par de clave y dato
+	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
+		if(hash_iter_al_final(iter))
+			return false;
+		iter->posicion++;
+	}
 	iter->actual = iter->hash->tabla[iter->posicion];
+	return true;
 }
 
 const char *hash_iter_ver_actual(const hash_iter_t* iter){
-	const char * clave = strdup(iter->actual.clave);
-	return clave;
+	return iter->hash->tabla[iter->posicion].clave;
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
