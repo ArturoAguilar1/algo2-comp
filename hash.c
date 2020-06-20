@@ -153,31 +153,26 @@ void *hash_borrar(hash_t *hash, const char *clave){
 void *hash_obtener(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	void *dato;
+		
+	// if(hash->tabla[indice].estado == LIBRE)
+	// 	return NULL;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
+		if(hash->tabla[indice].estado == BORRADO){
+			indice++;
+			if(indice == hash->tam)
+				indice = 0;	
+			continue;
+		}
 		if(!strcmp(hash->tabla[indice].clave,clave)){
 			dato = hash->tabla[indice].dato;
 			return dato;
 		}
-		indice++;
-
-		// while(hash->tabla[indice].estado == BORRADO){
-		// 	indice++;
-		// 	if(indice >= hash->tam)
-		// 		indice = 0;
-		// }
-		
-		// if(!strcmp(hash->tabla[indice].clave,clave))
-		// 	break;
-			
 		indice++;
 	
 		if(indice == hash->tam)
 			indice = 0;
 			
 	}
-	
-	// if(hash->tabla[indice].estado == LIBRE)
-	// 	return NULL;
 
 	return NULL;
 }
@@ -187,33 +182,26 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 //Tenemos que despues hacerlo en una funcion "buscar"
 bool hash_pertenece(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
-
-	if(strcmp(hash->tabla[indice].clave,clave) == 0 && hash->tabla[indice].estado == OCUPADO){
-
-	}
-
+	// if(hash->tabla[indice].estado == LIBRE)
+	// 	return false;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		while(hash->tabla[indice].estado == BORRADO){
+		if(hash->tabla[indice].estado == BORRADO){
 			indice++;
-			if(indice >= hash->tam)
-				indice = 0;
+			if(indice == hash->tam)
+				indice = 0;	
+			continue;
 		}
-		
-		if(!strcmp(hash->tabla[indice].clave,clave))
-			break;
-			
+		if(!strcmp(hash->tabla[indice].clave,clave)){
+			return true;
+		}
 		indice++;
 	
-		if(indice >= hash->tam)
+		if(indice == hash->tam)
 			indice = 0;
 			
-	}
-	
+	}	
 
-	if(hash->tabla[indice].estado == LIBRE)
-		return false;
-
-	return true;
+	return false;
 }
 
 void hash_destruir(hash_t *hash){
