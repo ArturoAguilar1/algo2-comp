@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "hash.h"
 
@@ -45,8 +46,9 @@ struct hash_iter{
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
-    if(!hash)   
-    	return NULL;
+    if(!hash) {
+       	return NULL;
+    }
 	hash->tabla = malloc(sizeof(hash_campo_t)*TAM_HASH_INICIAL);
     if(!hash->tabla){
     	free(hash);
@@ -90,14 +92,14 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if((double)(hash->cant / hash->tam) >= FACTOR_DE_CARGA){ // Superé el factor de carga limite, redimensiono el hash
 		hash_t * nuevo = malloc(sizeof(hash_t));
 		if(!nuevo)
-			return NULL;
+			return false;
 
-		nuevo->tam = //poner loque hay que redimensionar;
+		nuevo->tam = hash->tam =//poner loque hay que redimensionar;
 		nuevo->cant = 0;
 		//nuevo->destruir_hash_dato = destruir_dato;
 		nuevo->tabla = malloc(sizeof(hash_campo_t)*nuevo->tam);	
 		if(!nuevo->tabla)
-			return NULL;
+			return false;
 
 		for(size_t i=0;i<nuevo->tam;i++)
 			nuevo->tabla[i].estado = LIBRE;
@@ -105,9 +107,9 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		for(size_t i=0;i<hash->tam;i++){
 			if(hash->tabla[i].estado == OCUPADO)
 				hash_guardar(nuevo,hash->tabla[i].clave,hash->tabla[i].dato);
-
 		}
-		return nuevo;	
+		hash_destruir(hash);
+		hash = nuevo;	
 	}
 	
 	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
@@ -205,10 +207,12 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 void hash_destruir(hash_t *hash){
-	for(size_t i=0 ; i<hash->tam; i++){
-		if(hash->tabla[i].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
-			hash->destruir_hash_dato(hash->tabla[i].dato);
-			hash->destruir_hash_dato(hash->tabla[i].clave);
+	if(hash->destruir_hash_dato){
+		for(size_t i=0 ; i<hash->tam; i++){
+			if(hash->tabla[i].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
+				hash->destruir_hash_dato(hash->tabla[i].dato);
+				hash->destruir_hash_dato(hash->tabla[i].clave);
+			}
 		}
 	}
 	free(hash->tabla);
@@ -217,16 +221,23 @@ void hash_destruir(hash_t *hash){
 
 hash_iter_t *hash_iter_crear(const hash_t *hash){
 	hash_iter_t *iter = malloc(sizeof(hash_iter_t));
-	if(!iter) return NULL;
-
+	
+	if(!iter) 
+		return NULL;
 	iter->hash = hash;
 	iter->posicion = 0;
-
+	printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
 	//Hay que ver que pasa si la cantidad del hash es 0.
 	//Busco hasta el primer ocupado
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
+	//printf("Entré con %lu\n",iter->posicion);
+		if(iter->posicion == hash->cant){
+			iter->posicion = iter->hash->cant;
+			return iter;
+		}
 		iter->posicion++;
 	}
+
 	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;
 }
