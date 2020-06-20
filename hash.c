@@ -7,7 +7,7 @@
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 13
 #define FACTOR_DE_CARGA 0.7
-
+#define TABLA_INICIO 0
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
@@ -31,6 +31,14 @@ struct hash{
     hash_campo_t *tabla;
     hash_destruir_dato_t destruir_hash_dato;
 };
+
+struct hast_iter{
+	hash_t* hash;
+	hash_campo_t actual;
+	size_t posicion;
+};
+
+
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
@@ -166,6 +174,37 @@ void hash_destruir(hash_t *hash){
 	free(hash);
 }
 
+hash_iter_t *hash_iter_crear(const hash_t *hash){
+	hash_iter_t *iterador = malloc(sizeof(hash_iter_t));
+	if(!iterador)
+		return NULL;
+
+	iterador->hash = hash;
+	iterador.actual = hash->tabla[TABLA_INICIO];
+	iterador->posicion = TABLA_INICIO;
+
+	return iterador;
+}
+
+bool hash_iter_avanzar(hash_iter_t *iter){
+	if(hash_iter_al_final(iter))
+		return false;
+	iter->posicion++;
+	iter.actual = iter->hash->tabla[posicion];
+}
+
+const char *hash_iter_ver_actual(const hash_iter_t *iter){
+	const char clave = strdup(iter->actual.clave);
+	return clave;
+}
+
+bool hash_iter_al_final(const hash_iter_t *iter){
+	return iter->posicion < iter->hash->tam
+}
+
+void hash_iter_destruir(hash_iter_t* iter){
+	free(iter);
+}
 
 
 //Funcion de hash: Murmurhash3 de:
