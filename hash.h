@@ -5,8 +5,8 @@
 #include <stddef.h>
 
 // Los structs deben llamarse "hash" y "hash_iter".
-struct hash;
-struct hash_iter;
+// struct hash;
+// struct hash_iter;
 
 typedef struct hash hash_t;
 typedef struct hash_iter hash_iter_t;
