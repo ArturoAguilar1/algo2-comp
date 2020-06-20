@@ -72,7 +72,7 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 
-	int indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	
 	if(!strcmp(hash->tabla[indice].clave,clave)) //En esta parte no se si hay que borrar algo mas, la clave asumo que se encargaría barbara de borrarla, por lo tanto a nosotros no nos debería importar borrar la clave. 
 		hash->destruir_hash_dato(hash->tabla[indice].dato); 
@@ -81,7 +81,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	//else if(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO) Al pedo este if porque si encuentro uno vacio nunca va a entrar en el while (19/06)
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		indice++;
-		if(indice >= hash->tam) //Esto lo saqué del hash cerrado
+		if(indice == hash->tam) //Esto lo saqué del hash cerrado
 			indice = 0;
 	}
 	
@@ -231,6 +231,7 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 	iter->hash = hash;
 	iter->posicion = 0;
 
+	//Hay que ver que pasa si la cantidad del hash es 0.
 	//Busco hasta el primer ocupado
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
 		iter->posicion++;
@@ -257,7 +258,9 @@ const char *hash_iter_ver_actual(const hash_iter_t* iter){
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
-	return iter->posicion < iter->hash->tam;
+	//Si justo en el ultimo balde hay algo, con esto no entraria
+	//return iter->posicion < iter->hash->tam;
+	return iter->posicion == iter->hash->tam;
 }
 
 void hash_iter_destruir(hash_iter_t* iter){
