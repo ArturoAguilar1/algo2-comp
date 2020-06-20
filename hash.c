@@ -11,6 +11,7 @@
 
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 13
+#define FACTOR_REDIMENSION 3
 #define FACTOR_DE_CARGA 0.7
 #define TABLA_INICIO 0
 
@@ -49,6 +50,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     if(!hash) {
        	return NULL;
     }
+
 	hash->tabla = malloc(sizeof(hash_campo_t)*TAM_HASH_INICIAL);
     if(!hash->tabla){
     	free(hash);
@@ -64,59 +66,82 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
     return hash;
 }
+bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, size_t tam_tabla){
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % tam_tabla;
+	while(tabla[indice].estado == OCUPADO || tabla[indice].estado == BORRADO){
+		indice++;
+		if(indice == tam_tabla) //Esto lo saqué del hash cerrado
+		indice = 0;
+	}
+	//Al pasar los eleemntos de una tabla a otra, la clave ya tiene memoria.
+	tabla[indice].clave = clave; 
+	tabla[indice].dato = dato;
+	tabla[indice].estado = OCUPADO;
+	
+	return true;
+}
 
 bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
-	// hash_t *hash = malloc(sizeof(hash_campo_t));
-	// if(!hash)
-	// 	return NULL;
+	hash_campo_t *nueva_tabla = malloc(sizeof(hash_campo_t)*nuevo_tam);
+	if(nuevo_tam > 0 && !nueva_tabla)	return false;
+
+	for(size_t i=0;i <nuevo_tam;i++)
+		nueva_tabla[i].estado = LIBRE;
+
+	for(size_t i=0;i<hash->tam;i++){
+		if(hash->tabla[i].estado == OCUPADO){
+			if(!guardar_elementos_redimension(nueva_tabla,hash->tabla[i].clave,hash->tabla[i].dato,nuevo_tam)){
+				//fallo el pasaje de datos de la tabla vieja a la nueva
+				return false;
+			//guardar elementos de la vieja en la nueva tabla
+			}
+		}
+	}
+	hash->tam = nuevo_tam;
+	//free(hash->tabla)?? Liberar la memoria de la tabla vieja
+	hash->tabla = nueva_tabla;
+
 	return true;
-	//hash->tabla = malloc()
 }
 
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
-
+	if(clave == NULL)	return false;
+	//Redimension
+	if((double)(hash->cant / hash->tam) >= FACTOR_DE_CARGA){
+		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
+			//Falla la redimension
+			return false;
+		}
+	}
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
-	
-	if(!strcmp(hash->tabla[indice].clave,clave)) //En esta parte no se si hay que borrar algo mas, la clave asumo que se encargaría barbara de borrarla, por lo tanto a nosotros no nos debería importar borrar la clave. 
-		hash->destruir_hash_dato(hash->tabla[indice].dato); 
-	//Quiero guardar la misma clave, hago el caso borde.
-
-	//else if(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO) Al pedo este if porque si encuentro uno vacio nunca va a entrar en el while (19/06)
-	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
+	if(!strcmp(hash->tabla[indice].clave,clave)){ 
+		//Si la funcion de destuccion no es null, destruyo el anterior dato y guardo el nuevo
+		if(hash->destruir_hash_dato != NULL){
+			hash->destruir_hash_dato(hash->tabla[indice].dato); 
+		}
+		hash->tabla[indice].dato = dato;
+		return true;
+	}
+	/*//Si esta libre el balde del indice, lo meto ahi
+	else if(hash->tabla[indice].estado == LIBRE){
+		hash->tabla[indice].clave = strdup(clave);
+		hash->tabla[indice].dato = dato;
+		hash->tabla[indice].estado = OCUPADO;
+		hash->cant++;
+	}*/
+	//Si no esta libre, y tampoco es la comparacion primera, entocnes busco disponibilidad para meter
+	else{
+		while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		indice++;
 		if(indice == hash->tam) //Esto lo saqué del hash cerrado
 			indice = 0;
-	}
-	
-	//Falta ver lo del tema de redimensionar si completamos una cierta cantidad.
-	if((double)(hash->cant / hash->tam) >= FACTOR_DE_CARGA){ // Superé el factor de carga limite, redimensiono el hash
-		hash_t * nuevo = malloc(sizeof(hash_t));
-		if(!nuevo)
-			return false;
-
-		nuevo->tam = hash->tam =//poner loque hay que redimensionar;
-		nuevo->cant = 0;
-		//nuevo->destruir_hash_dato = destruir_dato;
-		nuevo->tabla = malloc(sizeof(hash_campo_t)*nuevo->tam);	
-		if(!nuevo->tabla)
-			return false;
-
-		for(size_t i=0;i<nuevo->tam;i++)
-			nuevo->tabla[i].estado = LIBRE;
-
-		for(size_t i=0;i<hash->tam;i++){
-			if(hash->tabla[i].estado == OCUPADO)
-				hash_guardar(nuevo,hash->tabla[i].clave,hash->tabla[i].dato);
 		}
-		hash_destruir(hash);
-		hash = nuevo;	
+		hash->tabla[indice].clave = strdup(clave); 
+		hash->tabla[indice].dato = dato;
+		hash->tabla[indice].estado = OCUPADO;
+		hash->cant++;
 	}
 	
-	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
-	hash->tabla[indice].dato = dato;
-	hash->tabla[indice].estado = OCUPADO;
-	hash->cant++;
-
 	return true;
 
 }
