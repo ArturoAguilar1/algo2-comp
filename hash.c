@@ -35,6 +35,7 @@ typedef struct{
 struct hash{
     size_t cant;
     size_t tam;
+	size_t borrados;
     hash_campo_t *tabla;
     hash_destruir_dato_t destruir_hash_dato;
 };
@@ -59,11 +60,14 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 
     hash->tam = TAM_HASH_INICIAL;
     hash->cant = 0;
+	hash->borrados = 0;
     hash->destruir_hash_dato = destruir_dato;
 
-    for(size_t i=0;i<hash->tam;i++)
+    for(size_t i=0;i<hash->tam;i++){
     	hash->tabla[i].estado = LIBRE;
-
+		hash->tabla[i].clave = "";
+		hash->tabla[i].dato = NULL;
+	}
     return hash;
 }
 bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, size_t tam_tabla){
@@ -107,7 +111,7 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if(clave == NULL)	return false;
 	//Redimension
-	if((double)(hash->cant / hash->tam) >= FACTOR_DE_CARGA){
+	if((double)( (hash->cant + hash->borrados)/hash->tam) >= FACTOR_DE_CARGA){
 		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
 			//Falla la redimension
 			return false;
@@ -168,6 +172,8 @@ void *hash_borrar(hash_t *hash, const char *clave){
 			//Una vez encontrado el dato, hay que liberar la memoria asociada a la clave, ya que la pedimos en strdup
 			free(hash->tabla[indice].clave);
 			hash->tabla[indice].estado = BORRADO;
+			hash->cant--;
+			hash->borrados++;
 			return dato;
 		}
 		indice++;
@@ -252,13 +258,27 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 		return NULL;
 	iter->hash = hash;
 	iter->posicion = 0;
+<<<<<<< HEAD
 
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
 		if(iter->posicion == hash->tam){
 			break;
+=======
+	//Hay que ver que pasa si la cantidad del hash es 0.
+	if(iter->hash->cant > 0){
+		while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
+		//printf("Entré con %lu\n",iter->posicion);
+			if(iter->posicion == hash->cant){
+				break;
+			}
+			iter->posicion++;
+>>>>>>> f17c6621d6f475c9abc46c35a837e010128ec670
 		}
-		iter->posicion++;
 	}
+<<<<<<< HEAD
+=======
+	printf("iter -> posicion = %lu , iter -> tam = %lu Cantidad del hash vacio: %zu \n",iter->posicion,iter->hash->tam,iter->hash->cant);
+>>>>>>> f17c6621d6f475c9abc46c35a837e010128ec670
 
 	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;
@@ -284,6 +304,7 @@ const char *hash_iter_ver_actual(const hash_iter_t* iter){
 bool hash_iter_al_final(const hash_iter_t *iter){
 	//Si justo en el ultimo balde hay algo, con esto no entraria
 	//return iter->posicion < iter->hash->tam;
+	if(iter->hash->cant == 0) return true;
 	return iter->posicion == iter->hash->tam;
 }
 
