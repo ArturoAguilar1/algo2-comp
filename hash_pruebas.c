@@ -17,8 +17,7 @@
 /* ******************************************************************
  *                        PRUEBAS UNITARIAS
  * *****************************************************************/
-
-static void prueba_crear_hash_vacio()
+ void prueba_crear_hash_vacio()
 {
     hash_t* hash = hash_crear(NULL);
 
@@ -47,7 +46,7 @@ void prueba_iterar_hash_vacio()
  void prueba_hash_insertar()
 {
     hash_t* hash = hash_crear(NULL);
-
+    print_test("hash se crea joya",hash);
     char *clave1 = "perro", *valor1 = "guau";
     char *clave2 = "gato", *valor2 = "miau";
     char *clave3 = "vaca", *valor3 = "mu";
@@ -400,9 +399,9 @@ void prueba_iterar_hash_vacio()
 void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    prueba_crear_hash_vacio();
-    // prueba_iterar_hash_vacio();
-    // prueba_hash_insertar();
+    //prueba_crear_hash_vacio(); //OK
+    //prueba_iterar_hash_vacio(); //Corregir, todo OK, pero con valgrind genera errores
+     prueba_hash_insertar();
     // prueba_hash_reemplazar();
     // prueba_hash_reemplazar_con_destruir();
     // prueba_hash_borrar();
