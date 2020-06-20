@@ -32,23 +32,12 @@ struct hash{
     hash_destruir_dato_t destruir_hash_dato;
 };
 
-<<<<<<< HEAD
 struct hast_iter{
 	hash_t* hash;
 	hash_campo_t actual;
 	size_t posicion;
 };
 
-
-
-=======
-struct hash_iter{
-    hash_t* hash;
-    hash_campo_t actual;
-    size_t posicion;
-};
-
->>>>>>> 68a80265acd51096341f3b1dee1e3fddf5c5b0ab
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
     if(!hash)   
@@ -94,7 +83,27 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	}
 	
 	//Falta ver lo del tema de redimensionar si completamos una cierta cantidad.
-	if((double)(hash->cantidad / hash->capacidad) >= FACTOR_DE_CARGA){
+	if((double)(hash->cantidad / hash->capacidad) >= FACTOR_DE_CARGA){ // Superé el factor de carga limite, redimensiono el hash
+		hash_t * nuevo = malloc(sizeof(hash_iter_t));
+		if(!nuevo)
+			return NULL;
+
+		nuevo->tam = //poner loque hay que redimensionar;
+		nuevo->cant = 0;
+		nuevo->destruir_hash_dato = destruir_dato;
+		nuevo->tabla = malloc(sizeof(hash_campo_t)*nuevo->tam);	
+		if(!nuevo->tabla)
+			return NULL;
+
+		for(size_t i=0;i<nuevo->tam;i++)
+			nuevo->tabla[i].estado = VACIO;
+
+		for(size_t i=0;i<hash->tam;i++){
+			if(hash->tabla[i].estado == OCUPADO)
+				hash_guardar(nuevo,hash->tabla[i].clave,hash->tabla[i].dato);
+
+		return nuevo;	
+		}
 	}
 	
 	hash->tabla[indice].clave = strdup(clave); // Esto es lo que me había equivocado de no hacer un malloc sino que ya lo tenemos malloqueado (19/06)
