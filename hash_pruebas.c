@@ -401,8 +401,8 @@ void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
     prueba_crear_hash_vacio();
-    // prueba_iterar_hash_vacio();
-    // prueba_hash_insertar();
+    //prueba_iterar_hash_vacio();
+    prueba_hash_insertar();
     // prueba_hash_reemplazar();
     // prueba_hash_reemplazar_con_destruir();
     // prueba_hash_borrar();

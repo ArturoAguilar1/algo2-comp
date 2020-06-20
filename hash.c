@@ -114,6 +114,7 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		}
 	}
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
+	printf("Entré\n");
 	if(!strcmp(hash->tabla[indice].clave,clave)){ 
 		//Si la funcion de destuccion no es null, destruyo el anterior dato y guardo el nuevo
 		if(hash->destruir_hash_dato != NULL){
@@ -251,15 +252,11 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 		return NULL;
 	iter->hash = hash;
 	iter->posicion = 0;
-	//Hay que ver que pasa si la cantidad del hash es 0.
-	//Busco hasta el primer ocupado
-	printf("La concha de su madre \n");
+
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
-		printf("Entré con %lu\n",iter->posicion);
-		/*if(iter->posicion >= hash->cant){
-			printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
+		if(iter->posicion == hash->tam){
 			break;
-		}*/
+		}
 		iter->posicion++;
 	}
 
@@ -281,7 +278,7 @@ bool hash_iter_avanzar(hash_iter_t *iter){
 }
 
 const char *hash_iter_ver_actual(const hash_iter_t* iter){
-	return iter->hash->tabla[iter->posicion].clave;
+	return !hash_iter_al_final(iter) ? iter->hash->tabla[iter->posicion].clave : NULL;
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
