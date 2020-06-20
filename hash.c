@@ -228,14 +228,15 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 	iter->posicion = 0;
 	//Hay que ver que pasa si la cantidad del hash es 0.
 	//Busco hasta el primer ocupado
+	printf("La concha de su madre \n");
 	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
-	//printf("Entré con %lu\n",iter->posicion);
-		if(iter->posicion == hash->cant){
+		printf("Entré con %lu\n",iter->posicion);
+		/*if(iter->posicion >= hash->cant){
+			printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
 			break;
-		}
+		}*/
 		iter->posicion++;
 	}
-	printf("iter -> posicion = %lu , iter -> tam = %lu \n",iter->posicion,iter->hash->tam);
 
 	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;
