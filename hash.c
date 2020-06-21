@@ -9,6 +9,8 @@
 
 #define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
+
+//AHOARA
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 13
 #define FACTOR_REDIMENSION 3

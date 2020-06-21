@@ -401,17 +401,17 @@ void prueba_iterar_hash_vacio()
 void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    //prueba_crear_hash_vacio(); //OK && VALGRIND
-    //prueba_iterar_hash_vacio(); //OK && VALGRIND
-    //prueba_hash_insertar(); //OK && VALGRIND
-    //prueba_hash_reemplazar(); //OK && VALGRIND
-    //prueba_hash_reemplazar_con_destruir(); //OK && VALGRIND
-    // prueba_hash_borrar(); //OK && VALGRIND
-    // prueba_hash_clave_vacia(); //OK && VALGRIND
-    // prueba_hash_valor_null(); //OK && VALGRIND
+    prueba_crear_hash_vacio(); //OK && VALGRIND
+    prueba_iterar_hash_vacio(); //OK && VALGRIND
+    prueba_hash_insertar(); //OK && VALGRIND
+    prueba_hash_reemplazar(); //OK && VALGRIND
+    prueba_hash_reemplazar_con_destruir(); //OK && VALGRIND
+    prueba_hash_borrar(); //OK && VALGRIND
+    prueba_hash_clave_vacia(); //OK && VALGRIND
+    prueba_hash_valor_null(); //OK && VALGRIND
      prueba_hash_volumen(5000, true); //OK 
-    // prueba_hash_iterar(); //OK && VALGRIND
-    // prueba_hash_iterar_volumen(5000);
+    prueba_hash_iterar(); //OK && VALGRIND
+    prueba_hash_iterar_volumen(5000);
 }
 
 void pruebas_volumen_catedra(size_t largo)
