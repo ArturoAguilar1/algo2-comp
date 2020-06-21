@@ -73,7 +73,13 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 //Iterador Externo
 
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
+    abb_iter_t *abb_iter = malloc(sizeof(abb_iter_t));
+    if(!abb_iter)   return NULL;
 
+    abb_iter->abb = arbol;
+
+
+    return abb_iter;
 }
 
 
