@@ -225,6 +225,7 @@ void prueba_iterar_hash_vacio()
         sprintf(claves[i], "%08d", i);
         *valores[i] = i;
         ok = hash_guardar(hash, claves[i], valores[i]);
+        //hash_imprimir(hash);
         if (!ok) break;
     }
 

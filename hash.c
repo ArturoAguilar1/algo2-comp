@@ -70,11 +70,11 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
 	}
     return hash;
 }
-bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, size_t tam_tabla){
-	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % tam_tabla;
-	while(tabla[indice].estado == OCUPADO || tabla[indice].estado == BORRADO){
+bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, size_t nuevo_tam){
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % nuevo_tam;
+	while(tabla[indice].estado == OCUPADO){
 		indice++;
-		if(indice == tam_tabla) //Esto lo saqué del hash cerrado
+		if(indice == nuevo_tam) //Esto lo saqué del hash cerrado
 		indice = 0;
 	}
 	//Al pasar los eleemntos de una tabla a otra, la clave ya tiene memoria.
@@ -91,8 +91,8 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 
 	for(size_t i=0;i <nuevo_tam;i++){
 		nueva_tabla[i].estado = LIBRE;
-		hash->tabla[i].clave = "";
-		hash->tabla[i].dato = NULL;
+		nueva_tabla[i].clave = "";
+		nueva_tabla[i].dato = NULL;
 	}
 
 	for(size_t i=0;i<hash->tam;i++){
@@ -100,7 +100,6 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 			if(!guardar_elementos_redimension(nueva_tabla,hash->tabla[i].clave,hash->tabla[i].dato,nuevo_tam)){
 				//fallo el pasaje de datos de la tabla vieja a la nueva
 				return false;
-			//guardar elementos de la vieja en la nueva tabla
 			}
 		}
 	}
@@ -111,11 +110,25 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 	return true;
 }
 
+void hash_imprimir(hash_t *hash){
+	printf("HASH:\n");
+	for(size_t i = 0; i < hash->tam; i++){
+		if(hash->tabla[i].estado == OCUPADO){
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,hash->tabla[i].clave,"Ocupado");	
+		}else if(hash->tabla[i].estado == LIBRE){
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Vacio","Libre");
+		}else{
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Clave Borrada","Borrado");
+		}		
+	}
+}
+
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if(clave == NULL)	return false;
 	//Redimension
-	if((double)((hash->cant + hash->borrados)/ hash->tam) >= FACTOR_DE_CARGA){
-		printf("Entro a redimensionar\n");
+	float carga = (float)(hash->cant + hash->borrados)/ (float)hash->tam;
+	//printf("CARGA: %f CANT: %zu BORRADOS: %zu \n",carga,hash->cant,hash->borrados);	
+	if(carga >= FACTOR_DE_CARGA){
 		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
 			//Falla la redimension
 			return false;

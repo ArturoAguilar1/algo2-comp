@@ -49,6 +49,8 @@ bool hash_pertenece(const hash_t *hash, const char *clave);
  */
 size_t hash_cantidad(const hash_t *hash);
 
+void hash_imprimir(hash_t *hash);
+
 /* Destruye la estructura liberando la memoria pedida y llamando a la función
  * destruir para cada par (clave, dato).
  * Pre: La estructura hash fue inicializada
