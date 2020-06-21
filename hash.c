@@ -294,16 +294,21 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 }
 
 bool hash_iter_avanzar(hash_iter_t *iter){
-	// if(hash_iter_al_final(iter))
-	// 		return false;
-	//Hay que buscar la proxima posicion donde realmente haya un par de clave y dato
-	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
-		if(hash_iter_al_final(iter))
-			return false;
-		iter->posicion++;
-	}
-	iter->actual = iter->hash->tabla[iter->posicion];
-	return true;
+ 
+    if(hash_iter_al_final(iter))
+        return false;
+   
+    while(iter->posicion < iter->hash->tam){
+        iter->posicion++;
+        if(hash_iter_al_final(iter))
+            return false;
+ 
+        if(iter->hash->tabla[iter->posicion].estado == OCUPADO)
+            break;
+    }
+ 
+    iter->actual = iter->hash->tabla[iter->posicion];
+    return true;
 }
 
 const char *hash_iter_ver_actual(const hash_iter_t* iter){
@@ -311,8 +316,6 @@ const char *hash_iter_ver_actual(const hash_iter_t* iter){
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
-	//Si justo en el ultimo balde hay algo, con esto no entraria
-	//return iter->posicion < iter->hash->tam;
 	if(iter->hash->cant == 0)	return true;
 	return iter->posicion == iter->hash->tam;
 }
