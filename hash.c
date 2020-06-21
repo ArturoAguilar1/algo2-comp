@@ -89,8 +89,11 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 	hash_campo_t *nueva_tabla = malloc(sizeof(hash_campo_t)*nuevo_tam);
 	if(nuevo_tam > 0 && !nueva_tabla)	return false;
 
-	for(size_t i=0;i <nuevo_tam;i++)
+	for(size_t i=0;i <nuevo_tam;i++){
 		nueva_tabla[i].estado = LIBRE;
+		hash->tabla[i].clave = "";
+		hash->tabla[i].dato = NULL;
+	}
 
 	for(size_t i=0;i<hash->tam;i++){
 		if(hash->tabla[i].estado == OCUPADO){
@@ -112,13 +115,14 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if(clave == NULL)	return false;
 	//Redimension
 	if((double)((hash->cant + hash->borrados)/ hash->tam) >= FACTOR_DE_CARGA){
+		printf("Entro a redimensionar\n");
 		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
 			//Falla la redimension
 			return false;
 		}
 	}
-	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
-	printf("Entré\n");
+	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
+
 	if(hash->cant > 0 && !strcmp(hash->tabla[indice].clave,clave)){ 
 		//Si la funcion de destuccion no es null, destruyo el anterior dato y guardo el nuevo
 		if(hash->destruir_hash_dato != NULL){
@@ -239,11 +243,11 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 void hash_destruir(hash_t *hash){
-	if(hash->destruir_hash_dato){
+	if(hash->destruir_hash_dato != NULL){
 		for(size_t i=0 ; i<hash->tam; i++){
 			if(hash->tabla[i].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
-				// hash->destruir_hash_dato(hash->tabla[i].dato);
-				// hash->destruir_hash_dato(hash->tabla[i].clave);
+				hash->destruir_hash_dato(hash->tabla[i].dato);
+				hash->destruir_hash_dato(hash->tabla[i].clave);
 			}
 		}
 	}else{
