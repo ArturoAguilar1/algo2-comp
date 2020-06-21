@@ -9,7 +9,7 @@
 
 #define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
-//Tiene que ser si o si numero primo el inicial
+
 #define TAM_HASH_INICIAL 37
 #define FACTOR_REDIMENSION 3
 #define FACTOR_DE_CARGA 0.7
@@ -220,19 +220,12 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 }
 
 void hash_destruir(hash_t *hash){
-	if(hash->destruir_hash_dato != NULL){
-		for(size_t i=0 ; i<hash->tam; i++){
-			if(hash->tabla[i].estado == OCUPADO){ 
+	for(size_t i = 0; i < hash->tam; i++){
+		if(hash->tabla[i].estado == OCUPADO){
+			if(hash->destruir_hash_dato != NULL){
 				hash->destruir_hash_dato(hash->tabla[i].dato);
-				hash->destruir_hash_dato(hash->tabla[i].clave);
 			}
-		}
-	}else{
-		for(size_t i=0 ; i<hash->tam; i++){
-			if(hash->tabla[i].estado == OCUPADO){
-				free(hash->tabla[i].clave);
-				//free(hash->tabla[i].dato);
-			}
+			free(hash->tabla[i].clave);
 		}
 	}
 	free(hash->tabla);
