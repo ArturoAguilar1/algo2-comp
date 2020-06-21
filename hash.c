@@ -9,13 +9,10 @@
 
 #define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
-
-//AHOARA
 //Tiene que ser si o si numero primo el inicial
 #define TAM_HASH_INICIAL 37
 #define FACTOR_REDIMENSION 3
 #define FACTOR_DE_CARGA 0.7
-
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 //uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
@@ -48,7 +45,7 @@ struct hash_iter{
 };
 
 void inicializar_tabla(hash_campo_t *ptr,size_t tam){
-	for(size_t i=0;i<tam;i++){
+	for(size_t i=0 ; i<tam ; i++){
     	ptr[i].estado = LIBRE;
 		ptr[i].clave = "";
 		ptr[i].dato = NULL;
@@ -66,6 +63,7 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     	free(hash);
     	return NULL;
     }
+
     hash->tam = TAM_HASH_INICIAL;
     hash->cant = 0;
 	hash->borrados = 0;
@@ -83,7 +81,6 @@ bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, 
 		if(indice == nuevo_tam)
 			indice = 0;
 	}
-	//Al pasar los eleemntos de una tabla a otra, la clave ya tiene memoria.
 	tabla[indice].clave = clave; 
 	tabla[indice].dato = dato;
 	tabla[indice].estado = OCUPADO;
@@ -108,6 +105,7 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 	hash->tam = nuevo_tam;
 	free(hash->tabla);
 	hash->tabla = nueva_tabla;
+	hash->borrados = 0;
 
 	return true;
 }
@@ -130,14 +128,6 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 		hash->tabla[indice].dato = dato;
 		return true;
 	}
-	/*//Si esta libre el balde del indice, lo meto ahi
-	else if(hash->tabla[indice].estado == LIBRE){
-		hash->tabla[indice].clave = strdup(clave);
-		hash->tabla[indice].dato = dato;
-		hash->tabla[indice].estado = OCUPADO;
-		hash->cant++;
-	}*/
-	//Si no esta libre, y tampoco es la comparacion primera, entocnes busco disponibilidad para meter
 	else{
 		while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 			indice++;
@@ -170,7 +160,6 @@ void *hash_borrar(hash_t *hash, const char *clave){
 		}
 		if(!strcmp(hash->tabla[indice].clave,clave)){
 			dato = hash->tabla[indice].dato;
-			//Una vez encontrado el dato, hay que liberar la memoria asociada a la clave, ya que la pedimos en strdup
 			free(hash->tabla[indice].clave);
 			hash->tabla[indice].estado = BORRADO;
 			hash->cant--;
@@ -188,9 +177,6 @@ void *hash_borrar(hash_t *hash, const char *clave){
 void *hash_obtener(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	void *dato;
-		
-	// if(hash->tabla[indice].estado == LIBRE)
-	// 	return NULL;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		if(hash->tabla[indice].estado == BORRADO){
 			indice++;
@@ -211,7 +197,6 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 
 	return NULL;
 }
-
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
