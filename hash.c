@@ -10,7 +10,7 @@
 #define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
 
-#define TAM_HASH_INICIAL 37
+#define TAM_HASH_INICIAL 13
 #define FACTOR_REDIMENSION 3
 #define FACTOR_DE_CARGA 0.7
 
@@ -288,7 +288,7 @@ void hash_imprimir(hash_t *hash){
 	printf("HASH:\n");
 	for(size_t i = 0; i < hash->tam; i++){
 		if(hash->tabla[i].estado == OCUPADO){
-			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,hash->tabla[i].clave,"Ocupado");	
+			printf("[Indice: %zu] Clave: \x1b[1m\x1b[32m %s \x1b[0m Estado: %s \n",i,hash->tabla[i].clave,"Ocupado");	
 		}else if(hash->tabla[i].estado == LIBRE){
 			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Vacio","Libre");
 		}else{

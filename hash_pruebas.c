@@ -150,7 +150,7 @@ void prueba_iterar_hash_vacio()
     print_test("Prueba hash insertar clave1", hash_guardar(hash, clave1, valor1));
     print_test("Prueba hash insertar clave2", hash_guardar(hash, clave2, valor2));
     print_test("Prueba hash insertar clave3", hash_guardar(hash, clave3, valor3));
-
+    hash_imprimir(hash);
     /* Al borrar cada elemento comprueba que ya no está pero los otros sí. */
     print_test("Prueba hash pertenece clave3, es verdadero", hash_pertenece(hash, clave3));
     print_test("Prueba hash borrar clave3, es valor3", hash_borrar(hash, clave3) == valor3);
@@ -158,21 +158,21 @@ void prueba_iterar_hash_vacio()
     print_test("Prueba hash pertenece clave3, es falso", !hash_pertenece(hash, clave3));
     print_test("Prueba hash obtener clave3, es NULL", !hash_obtener(hash, clave3));
     print_test("Prueba hash la cantidad de elementos es 2", hash_cantidad(hash) == 2);
-
+hash_imprimir(hash);
     print_test("Prueba hash pertenece clave1, es verdadero", hash_pertenece(hash, clave1));
     print_test("Prueba hash borrar clave1, es valor1", hash_borrar(hash, clave1) == valor1);
     print_test("Prueba hash borrar clave1, es NULL", !hash_borrar(hash, clave1));
     print_test("Prueba hash pertenece clave1, es falso", !hash_pertenece(hash, clave1));
     print_test("Prueba hash obtener clave1, es NULL", !hash_obtener(hash, clave1));
     print_test("Prueba hash la cantidad de elementos es 1", hash_cantidad(hash) == 1);
-
+hash_imprimir(hash);
     print_test("Prueba hash pertenece clave2, es verdadero", hash_pertenece(hash, clave2));
     print_test("Prueba hash borrar clave2, es valor2", hash_borrar(hash, clave2) == valor2);
     print_test("Prueba hash borrar clave2, es NULL", !hash_borrar(hash, clave2));
     print_test("Prueba hash pertenece clave2, es falso", !hash_pertenece(hash, clave2));
     print_test("Prueba hash obtener clave2, es NULL", !hash_obtener(hash, clave2));
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
-
+hash_imprimir(hash);
     hash_destruir(hash);
 }
 
@@ -242,6 +242,8 @@ void prueba_iterar_hash_vacio()
 
     if (debug) print_test("Prueba hash pertenece y obtener muchos elementos", ok);
     if (debug) print_test("Prueba hash la cantidad de elementos es correcta", hash_cantidad(hash) == largo);
+
+    hash_imprimir(hash);
 
     /* Verifica que borre y devuelva los valores correctos */
     for (size_t i = 0; i < largo; i++) {
@@ -401,17 +403,17 @@ void prueba_iterar_hash_vacio()
 void pruebas_hash_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-   prueba_crear_hash_vacio(); //OK && VALGRIND
-   prueba_iterar_hash_vacio(); //OK && VALGRIND
-   prueba_hash_insertar(); //OK && VALGRIND
-   prueba_hash_reemplazar(); //OK && VALGRIND
-    prueba_hash_reemplazar_con_destruir(); //OK && VALGRIND
-    prueba_hash_borrar(); //OK && VALGRIND
-    prueba_hash_clave_vacia(); //OK && VALGRIND
-     prueba_hash_valor_null(); //OK && VALGRIND
-    prueba_hash_volumen(5000, true); //OK && VALGRIND
-    prueba_hash_iterar(); //OK && VALGRIND
-   prueba_hash_iterar_volumen(5000); //OK && VALGRIND
+//    prueba_crear_hash_vacio(); //OK && VALGRIND
+//    prueba_iterar_hash_vacio(); //OK && VALGRIND
+//    prueba_hash_insertar(); //OK && VALGRIND
+//    prueba_hash_reemplazar(); //OK && VALGRIND
+//     prueba_hash_reemplazar_con_destruir(); //OK && VALGRIND
+     prueba_hash_borrar(); //OK && VALGRIND
+//     prueba_hash_clave_vacia(); //OK && VALGRIND
+//      prueba_hash_valor_null(); //OK && VALGRIND
+ //    prueba_hash_volumen(5000, true); //OK && VALGRIND
+//     prueba_hash_iterar(); //OK && VALGRIND
+//    prueba_hash_iterar_volumen(5000); //OK && VALGRIND
 }
 
 void pruebas_volumen_catedra(size_t largo)
