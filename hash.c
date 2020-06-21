@@ -12,10 +12,10 @@
 
 //AHOARA
 //Tiene que ser si o si numero primo el inicial
-#define TAM_HASH_INICIAL 13
+#define TAM_HASH_INICIAL 37
 #define FACTOR_REDIMENSION 3
 #define FACTOR_DE_CARGA 0.7
-#define TABLA_INICIO 0
+
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 //uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
@@ -42,11 +42,18 @@ struct hash{
     hash_destruir_dato_t destruir_hash_dato;
 };
 struct hash_iter{
-	//Const porque la funcion por la catedra recibe const entonces el compilador jode con eso
 	const hash_t *hash;
 	hash_campo_t actual;
 	size_t posicion;
 };
+
+void inicializar_tabla(hash_campo_t *ptr,size_t tam){
+	for(size_t i=0;i<tam;i++){
+    	ptr[i].estado = LIBRE;
+		ptr[i].clave = "";
+		ptr[i].dato = NULL;
+	}
+}
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
@@ -59,25 +66,22 @@ hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     	free(hash);
     	return NULL;
     }
-
     hash->tam = TAM_HASH_INICIAL;
     hash->cant = 0;
 	hash->borrados = 0;
     hash->destruir_hash_dato = destruir_dato;
 
-    for(size_t i=0;i<hash->tam;i++){
-    	hash->tabla[i].estado = LIBRE;
-		hash->tabla[i].clave = "";
-		hash->tabla[i].dato = NULL;
-	}
+	inicializar_tabla(hash->tabla,hash->tam);
+
     return hash;
 }
+
 bool guardar_elementos_redimension(hash_campo_t *tabla,char *clave, void *dato, size_t nuevo_tam){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % nuevo_tam;
 	while(tabla[indice].estado == OCUPADO){
 		indice++;
-		if(indice == nuevo_tam) //Esto lo saqué del hash cerrado
-		indice = 0;
+		if(indice == nuevo_tam)
+			indice = 0;
 	}
 	//Al pasar los eleemntos de una tabla a otra, la clave ya tiene memoria.
 	tabla[indice].clave = clave; 
@@ -91,55 +95,35 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 	hash_campo_t *nueva_tabla = malloc(sizeof(hash_campo_t)*nuevo_tam);
 	if(nuevo_tam > 0 && !nueva_tabla)	return false;
 
-	for(size_t i=0;i <nuevo_tam;i++){
-		nueva_tabla[i].estado = LIBRE;
-		nueva_tabla[i].clave = "";
-		nueva_tabla[i].dato = NULL;
-	}
+	inicializar_tabla(nueva_tabla,nuevo_tam);
 
 	for(size_t i=0;i<hash->tam;i++){
 		if(hash->tabla[i].estado == OCUPADO){
 			if(!guardar_elementos_redimension(nueva_tabla,hash->tabla[i].clave,hash->tabla[i].dato,nuevo_tam)){
-				//fallo el pasaje de datos de la tabla vieja a la nueva
 				return false;
 			}
 		}
 	}
+
 	hash->tam = nuevo_tam;
-	//free(hash->tabla)?? Liberar la memoria de la tabla vieja
+	free(hash->tabla);
 	hash->tabla = nueva_tabla;
 
 	return true;
 }
 
-void hash_imprimir(hash_t *hash){
-	printf("HASH:\n");
-	for(size_t i = 0; i < hash->tam; i++){
-		if(hash->tabla[i].estado == OCUPADO){
-			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,hash->tabla[i].clave,"Ocupado");	
-		}else if(hash->tabla[i].estado == LIBRE){
-			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Vacio","Libre");
-		}else{
-			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Clave Borrada","Borrado");
-		}		
-	}
-}
-
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if(clave == NULL)	return false;
-	//Redimension
-	float carga = (float)(hash->cant + hash->borrados)/ (float)hash->tam;
-	//printf("CARGA: %f CANT: %zu BORRADOS: %zu \n",carga,hash->cant,hash->borrados);	
-	if(carga >= FACTOR_DE_CARGA){
+	
+	if((float)(hash->cant + hash->borrados)/ (float)hash->tam >= FACTOR_DE_CARGA){
 		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
-			//Falla la redimension
 			return false;
 		}
 	}
+
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
 
 	if(hash->cant > 0 && !strcmp(hash->tabla[indice].clave,clave)){ 
-		//Si la funcion de destuccion no es null, destruyo el anterior dato y guardo el nuevo
 		if(hash->destruir_hash_dato != NULL){
 			hash->destruir_hash_dato(hash->tabla[indice].dato); 
 		}
@@ -156,26 +140,24 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	//Si no esta libre, y tampoco es la comparacion primera, entocnes busco disponibilidad para meter
 	else{
 		while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		indice++;
-		if(indice == hash->tam) //Esto lo saqué del hash cerrado
-			indice = 0;
+			indice++;
+			if(indice == hash->tam) 
+				indice = 0;
 		}
 		hash->tabla[indice].clave = strdup(clave); 
 		hash->tabla[indice].dato = dato;
 		hash->tabla[indice].estado = OCUPADO;
 		hash->cant++;
 	}
-	
-	return true;
 
+	return true;
 }
 
 size_t hash_cantidad(const hash_t *hash){
 	return hash->cant;
 }
 
-//Creo que al borrar no se deberia actualizar la cantidad, porque cuando redimensionamos contamos el borrado como si esruviera ocupado
-// ya que al borrado no se le pueden guardar claves
+
 void *hash_borrar(hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
 	void *dato;
@@ -231,12 +213,8 @@ void *hash_obtener(const hash_t *hash, const char *clave){
 }
 
 
-//Si te parecen los cambios que hice a obtener, tambien los implementamos aca en pertence
-//Tenemos que despues hacerlo en una funcion "buscar"
 bool hash_pertenece(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
-	// if(hash->tabla[indice].estado == LIBRE)
-	// 	return false;
 	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
 		if(hash->tabla[indice].estado == BORRADO){
 			indice++;
@@ -253,14 +231,13 @@ bool hash_pertenece(const hash_t *hash, const char *clave){
 			indice = 0;
 			
 	}	
-
 	return false;
 }
 
 void hash_destruir(hash_t *hash){
 	if(hash->destruir_hash_dato != NULL){
 		for(size_t i=0 ; i<hash->tam; i++){
-			if(hash->tabla[i].estado == OCUPADO){ //el .h dice que debemos eliminar cada par, el tema es que no se si la funcion destruir hash dato recibe 2 parametros o 1, por eso lo puse dos veces (19/06)
+			if(hash->tabla[i].estado == OCUPADO){ 
 				hash->destruir_hash_dato(hash->tabla[i].dato);
 				hash->destruir_hash_dato(hash->tabla[i].clave);
 			}
@@ -284,13 +261,14 @@ hash_iter_t *hash_iter_crear(const hash_t *hash){
 	iter->hash = hash;
 	iter->posicion = 0;
 	if(iter->hash->cant > 0){
-	while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
-		if(iter->posicion == iter->hash->tam){
-			break;
-		}
+		while(iter->hash->tabla[iter->posicion].estado != OCUPADO){
+			if(iter->posicion == iter->hash->tam){
+				break;
+			}
 		iter->posicion++;
+		}
 	}
-	}
+
 	iter->actual = iter->hash->tabla[iter->posicion];
 	return iter;
 }
@@ -318,12 +296,27 @@ const char *hash_iter_ver_actual(const hash_iter_t* iter){
 }
 
 bool hash_iter_al_final(const hash_iter_t *iter){
-	if(iter->hash->cant == 0)	return true;
+	if(iter->hash->cant == 0)	
+		return true;
 	return iter->posicion == iter->hash->tam;
 }
 
 void hash_iter_destruir(hash_iter_t* iter){
 	free(iter);
+}
+
+
+void hash_imprimir(hash_t *hash){
+	printf("HASH:\n");
+	for(size_t i = 0; i < hash->tam; i++){
+		if(hash->tabla[i].estado == OCUPADO){
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,hash->tabla[i].clave,"Ocupado");	
+		}else if(hash->tabla[i].estado == LIBRE){
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Vacio","Libre");
+		}else{
+			printf("[Indice: %zu] Clave: %s Estado: %s \n",i,"Clave Borrada","Borrado");
+		}		
+	}
 }
 
 
@@ -395,22 +388,21 @@ uint32_t murmurhash(const char *key, uint32_t len, uint32_t seed) {
 Ahi explica que tiene muy buen rendimiento comparado a otras.
 Necesita la macro de funcion _PaDr_KAZE
 */
-// uint32_t FNV1A_Pippip(const char *str, size_t wrdlen) {
-// 	const uint32_t PRIME = 591798841; 
-//   uint32_t hash32; 
-//   uint64_t hash64 = 14695981039346656037U;
-// 	size_t Cycles, NDhead;
-//   if (wrdlen > 8) {
-// 	Cycles = ((wrdlen - 1)>>4) + 1; NDhead = wrdlen - (Cycles<<3);
-//   #pragma nounroll
-//         for(; Cycles--; str += 8) {
-// 		hash64 = ( hash64 ^ (*(uint64_t *)(str)) ) * PRIME;        
-// 		hash64 = ( hash64 ^ (*(uint64_t *)(str+NDhead)) ) * PRIME;        
-// 	}
-// } else
-// 	hash64 = ( hash64 ^ _PADr_KAZE(*(uint64_t *)(str+0), (8-wrdlen)<<3) ) * PRIME;        
-//   hash32 = (uint32_t)(hash64 ^ (hash64>>32)); 
-
-// return hash32 ^ (hash32 >> 16);
-// } 
+/*uint32_t FNV1A_Pippip(const char *str, size_t wrdlen) {
+	const uint32_t PRIME = 591798841; 
+  uint32_t hash32; 
+  uint64_t hash64 = 14695981039346656037U;
+	size_t Cycles, NDhead;
+  if (wrdlen > 8) {
+	Cycles = ((wrdlen - 1)>>4) + 1; NDhead = wrdlen - (Cycles<<3);
+  #pragma nounroll
+        for(; Cycles--; str += 8) {
+		hash64 = ( hash64 ^ (*(uint64_t *)(str)) ) * PRIME;        
+		hash64 = ( hash64 ^ (*(uint64_t *)(str+NDhead)) ) * PRIME;        
+	}
+} else
+	hash64 = ( hash64 ^ _PADr_KAZE(*(uint64_t *)(str+0), (8-wrdlen)<<3) ) * PRIME;        
+  hash32 = (uint32_t)(hash64 ^ (hash64>>32)); 
+return hash32 ^ (hash32 >> 16);
+} */
 
