@@ -150,7 +150,7 @@ void prueba_iterar_hash_vacio()
     print_test("Prueba hash insertar clave1", hash_guardar(hash, clave1, valor1));
     print_test("Prueba hash insertar clave2", hash_guardar(hash, clave2, valor2));
     print_test("Prueba hash insertar clave3", hash_guardar(hash, clave3, valor3));
-    hash_imprimir(hash);
+   // hash_imprimir(hash);
     /* Al borrar cada elemento comprueba que ya no está pero los otros sí. */
     print_test("Prueba hash pertenece clave3, es verdadero", hash_pertenece(hash, clave3));
     print_test("Prueba hash borrar clave3, es valor3", hash_borrar(hash, clave3) == valor3);
@@ -158,21 +158,21 @@ void prueba_iterar_hash_vacio()
     print_test("Prueba hash pertenece clave3, es falso", !hash_pertenece(hash, clave3));
     print_test("Prueba hash obtener clave3, es NULL", !hash_obtener(hash, clave3));
     print_test("Prueba hash la cantidad de elementos es 2", hash_cantidad(hash) == 2);
-hash_imprimir(hash);
+    //hash_imprimir(hash);
     print_test("Prueba hash pertenece clave1, es verdadero", hash_pertenece(hash, clave1));
     print_test("Prueba hash borrar clave1, es valor1", hash_borrar(hash, clave1) == valor1);
     print_test("Prueba hash borrar clave1, es NULL", !hash_borrar(hash, clave1));
     print_test("Prueba hash pertenece clave1, es falso", !hash_pertenece(hash, clave1));
     print_test("Prueba hash obtener clave1, es NULL", !hash_obtener(hash, clave1));
     print_test("Prueba hash la cantidad de elementos es 1", hash_cantidad(hash) == 1);
-hash_imprimir(hash);
+    //hash_imprimir(hash);
     print_test("Prueba hash pertenece clave2, es verdadero", hash_pertenece(hash, clave2));
     print_test("Prueba hash borrar clave2, es valor2", hash_borrar(hash, clave2) == valor2);
     print_test("Prueba hash borrar clave2, es NULL", !hash_borrar(hash, clave2));
     print_test("Prueba hash pertenece clave2, es falso", !hash_pertenece(hash, clave2));
     print_test("Prueba hash obtener clave2, es NULL", !hash_obtener(hash, clave2));
     print_test("Prueba hash la cantidad de elementos es 0", hash_cantidad(hash) == 0);
-hash_imprimir(hash);
+    //hash_imprimir(hash);
     hash_destruir(hash);
 }
 
@@ -243,7 +243,7 @@ hash_imprimir(hash);
     if (debug) print_test("Prueba hash pertenece y obtener muchos elementos", ok);
     if (debug) print_test("Prueba hash la cantidad de elementos es correcta", hash_cantidad(hash) == largo);
 
-    hash_imprimir(hash);
+    //hash_imprimir(hash);
 
     /* Verifica que borre y devuelva los valores correctos */
     for (size_t i = 0; i < largo; i++) {

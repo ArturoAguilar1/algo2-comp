@@ -10,9 +10,11 @@
 #define _PADr_KAZE(x, n) ( ((x) << (n))>>(n) )
 
 
-#define TAM_HASH_INICIAL 13
-#define FACTOR_REDIMENSION 3
-#define FACTOR_DE_CARGA 0.7
+#define TAM_HASH_INICIAL 37
+#define FACTOR_REDIMENSION_UP 3
+#define FACTOR_REDIMENSION_DOWN 2
+#define FACTOR_DE_CARGA_MAX 0.7
+#define FACTOR_DE_CARGA_MIN 0.25
 
 uint32_t murmurhash (const char *key, uint32_t len, uint32_t seed);
 //uint32_t FNV1A_Pippip(const char *str, size_t wrdlen);
@@ -51,6 +53,7 @@ void inicializar_tabla(hash_campo_t *ptr,size_t tam){
 		ptr[i].dato = NULL;
 	}
 }
+
 
 hash_t *hash_crear(hash_destruir_dato_t destruir_dato){
     hash_t *hash = malloc(sizeof(hash_t));
@@ -110,11 +113,15 @@ bool hash_redimensionar(hash_t *hash,size_t nuevo_tam){
 	return true;
 }
 
+size_t hash_cantidad(const hash_t *hash){
+	return hash->cant;
+}
+
 bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	if(clave == NULL)	return false;
 	
-	if((float)(hash->cant + hash->borrados)/ (float)hash->tam >= FACTOR_DE_CARGA){
-		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION)){
+	if((float)(hash->cant + hash->borrados)/ (float)hash->tam >= FACTOR_DE_CARGA_MAX){
+		if(!hash_redimensionar(hash,hash->tam * FACTOR_REDIMENSION_UP)){
 			return false;
 		}
 	}
@@ -143,80 +150,60 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato){
 	return true;
 }
 
-size_t hash_cantidad(const hash_t *hash){
-	return hash->cant;
+bool buscar_posicion(hash_campo_t *tabla,size_t *indice, size_t tam, const char *clave){
+	while(tabla[*indice].estado != LIBRE){
+		if(tabla[*indice].estado == BORRADO){
+			(*indice)++;
+			if(*indice == tam)
+				*indice = 0;	
+			continue;
+		}
+
+		if(!strcmp(tabla[*indice].clave,clave))
+			return true;
+
+		(*indice)++;
+		if(*indice == tam)
+			*indice = 0;
+	}
+	return false;
 }
 
 
 void *hash_borrar(hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash->tam;
 	void *dato;
-	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		if(hash->tabla[indice].estado == BORRADO){
-			indice++;
-			if(indice == hash->tam)
-				indice = 0;	
-			continue;
-		}
-		if(!strcmp(hash->tabla[indice].clave,clave)){
-			dato = hash->tabla[indice].dato;
-			free(hash->tabla[indice].clave);
-			hash->tabla[indice].estado = BORRADO;
-			hash->cant--;
-			hash->borrados++;
-			return dato;
-		}
-		indice++;
-		if(indice == hash->tam)
-			indice = 0;	
+	if(buscar_posicion(hash->tabla,&indice,hash->tam,clave)){
+		dato = hash->tabla[indice].dato;
+		free(hash->tabla[indice].clave);
+		hash->tabla[indice].estado = BORRADO;
+		hash->cant--;
+		hash->borrados++;
+	}
+	else
+		return NULL;
+		
+	if((float)hash->cant / (float)hash->tam <= FACTOR_DE_CARGA_MIN){
+		if(!hash_redimensionar(hash,hash->tam / FACTOR_REDIMENSION_DOWN))
+			return NULL;
 	}
 
-	return NULL;
+	return dato;
 }
 
 void *hash_obtener(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
 	void *dato;
-	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		if(hash->tabla[indice].estado == BORRADO){
-			indice++;
-			if(indice == hash->tam)
-				indice = 0;	
-			continue;
-		}
-		if(!strcmp(hash->tabla[indice].clave,clave)){
-			dato = hash->tabla[indice].dato;
-			return dato;
-		}
-		indice++;
-	
-		if(indice == hash->tam)
-			indice = 0;
-			
-	}
-
-	return NULL;
+	if(buscar_posicion(hash->tabla,&indice,hash->tam,clave)){
+		dato = hash->tabla[indice].dato;
+		return dato;
+	}else
+		return NULL;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
 	size_t indice = murmurhash(clave,(uint32_t)strlen(clave),seed_parametro) % hash -> tam;
-	while(hash->tabla[indice].estado == OCUPADO || hash->tabla[indice].estado == BORRADO){
-		if(hash->tabla[indice].estado == BORRADO){
-			indice++;
-			if(indice == hash->tam)
-				indice = 0;	
-			continue;
-		}
-		if(!strcmp(hash->tabla[indice].clave,clave)){
-			return true;
-		}
-		indice++;
-	
-		if(indice == hash->tam)
-			indice = 0;
-			
-	}	
-	return false;
+	return buscar_posicion(hash->tabla,&indice,hash->tam,clave);
 }
 
 void hash_destruir(hash_t *hash){
