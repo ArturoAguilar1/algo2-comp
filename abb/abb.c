@@ -40,12 +40,53 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 
     return abb;
 }
+bool abb_guadar_wrapper(abb_t *arbol, nodo_abb_t *raiz, nodo_abb_t *nodo){
+	if(!comparar(raiz->clave,nodo->clave)) // UN NODO YA EXISTENTE TIENE LA MISMA CLAVE
+		return false;
+	
+	if(comparar(nodo->clave,raiz->clave) <= MENOR){ //El nodo está en un valor mas chico que la raiz, tengo que doblar a la izq
+		if(!raiz->izq){ // EL IZQUIERDO DE LA RAIZ NO ESTÁ POR LO TANTO AHORA EL IZQUIERDO APUNTA A ESTE NODO
+			raiz->izq = nodo;
+			return true;
+		}
+		else 
+			abb_guadar_wrapper(arbol,raiz->izq,nodo); // LA RAIZ IZQUIERDA EXISTE POR LO TANTO TENGO QUE SEGUIR BUSCANDO PERO PONGO COMO RAIZ A RAIZ->IZQ
+	} 
+	
+	if(comparar(nodo->clave,raiz->clave) >= MAYOR){ // ES IGUAL QUE EN RAIZ IZQUIERDA PERO AHORA ES PARA LA DERECHA
+		if(!raiz->der){
+			raiz->der = nodo;
+			return true;
+		}
+		else 
+			abb_guardar_wrapper(arbol,raiz->der,nodo);
+	}
 
+}
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol)
 		return false;
 
+	nodo_abb_t *nodo = malloc(sizeof(nodo_abb_t));
+	if(!nodo)
+		return false;
+	
+	nodo->clave = strdup(clave);
+	nodo->dato = dato;
+
+	if(!arbol->raiz){ //El arbol no tiene hojas por lo tanto la raiz es el nodo
+		arbol->raiz = nodo;
+		return true;
+	}
+
+	if(!abb_guadar_wrapper(arbol,raiz,nodo)){
+		destruir(nodo->dato);
+		free(nodo->clave);
+		free(nodo);
+		return false;
+	} // HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
+    
     return true;
 }
 
@@ -61,14 +102,14 @@ bool abb_obtener_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave){
 		return NULL;
 
 
-	if(raiz->comparar(raiz->clave,clave) <= MENOR){
+	if(raiz->comparar(clave,raiz->clave) <= MENOR){
 		return abb_pertenece(arbol,raiz->izq,clave);
 	} // me tengo que ir al izquierdo
 	
 	if(!arbol->comparar(raiz->clave,clave))
 		return raiz->dato; //Encontré el dato
 
-	if(arbol->comparar(raiz->clave,clave) >= MAYOR){
+	if(arbol->comparar(clave,raiz->clave) >= MAYOR){
 		return abb_pertenece(arbol,raiz->der,clave);
 	} // me tengo que ir al derecho
 
@@ -85,7 +126,7 @@ bool abb_pertenece_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave
 	if(!raiz)
 		return false; 
 
-	if(raiz->comparar(raiz->clave,clave) <= MENOR){
+	if(raiz->comparar(clave,raiz->clave) <= MENOR){
 		return abb_pertenece(arbol,raiz->izq,clave);
 	} // me tengo que ir al izquierdo
 
@@ -93,7 +134,7 @@ bool abb_pertenece_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave
 		return true; //Encontré la clave
 
 
-	if(arbol->comparar(raiz->clave,clave) >= MAYOR){
+	if(arbol->comparar(clave,raiz->clave) >= MAYOR){
 		return abb_pertenece(arbol,raiz->der,clave);
 	} // me tengo que ir al derecho
 	
@@ -147,23 +188,47 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     if(!abb_iter)   return NULL;
 
     abb_iter->abb = arbol;
-
+    abb_iter->actual = arbol -> raiz;
 
     return abb_iter;
 }
 
 
 bool abb_iter_in_avanzar(abb_iter_t *iter){
-    return true;
+    if (abb_iter_in_al_final(iter))
+    	return false;
+
+    	if(iter->actual->izq)
+    		iter->actual = iter->actual -> izq;
+    	else if(iter->actual->der)
+	    	iter->actual = iter->actual -> der; // 
+    	
+    	return true;
 }
+bool abb_iter_in_al_final(const abb_iter_t *iter){
+	return (!iter->actual || (!iter->actual->izq && !iter->actual->der))
+}
+// Hay dos casos que considerar, este es el caso 1 que te lo explico por wp 
+
 
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-    return NULL;
+	return !abb_iter_in_al_final(iter) ? iter->actual->clave : NULL;
 }
 
-bool abb_iter_in_al_final(const abb_iter_t *iter){
-    return true;
+bool abb_iter_in_avanzar(abb_iter_t *iter){
+    if (abb_iter_in_al_final(iter))
+    	return false;
+
+    	if(iter->actual->izq)
+    		iter->actual = iter->actual -> izq;
+    	else
+	    	iter->actual = iter->actual -> der; // 
+    	
+    	return true;
 }
+bool abb_iter_in_al_final(const abb_iter_t *iter){
+	return !iter->actual;
+} // caso 2
 
 void abb_iter_in_destruir(abb_iter_t* iter){
     free(iter);
