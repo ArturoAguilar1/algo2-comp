@@ -1,5 +1,6 @@
 #define  _POSIX_C_SOURCE 200809L
 #include "abb.h"
+#include "pila.h"
 #define MENOR -1
 #define MAYOR 1
 
@@ -187,6 +188,14 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     abb_iter_t *abb_iter = malloc(sizeof(abb_iter_t));
     if(!abb_iter)   return NULL;
 
+	pila_t *pila_in = malloc(sizeof(pila_t));
+	if(!pila_in){
+		free(abb_iter);
+		return NULL;
+	}
+	pila_apilar(arbol->raiz);
+
+
     abb_iter->abb = arbol;
     abb_iter->actual = arbol -> raiz;
 
@@ -205,15 +214,29 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
     	
     	return true;
 }
-bool abb_iter_in_al_final(const abb_iter_t *iter){
-	return (!iter->actual || (!iter->actual->izq && !iter->actual->der))
-}
-// Hay dos casos que considerar, este es el caso 1 que te lo explico por wp 
 
+// bool abb_iter_in_al_final(const abb_iter_t *iter){
+// 	return (!iter->actual || (!iter->actual->izq && !iter->actual->der))
+// }
+// // Hay dos casos que considerar, este es el caso 1 que te lo explico por wp 
+
+// bool abb_iter_in_al_final(const abb_iter_t *iter){
+// 	return !iter->actual;
+// } // caso 2
+
+//Si la pila esta vacia, quiere decir que el iter llegó al final.
+bool abb_iter_in_al_final(const abb_iter_t *iter){
+	return pila_esta_vacia(iter->abb->raiz);
+}
 
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-	return !abb_iter_in_al_final(iter) ? iter->actual->clave : NULL;
+	return (char*)pila_ver_tope(iter->abb->raiz);
 }
+
+
+// const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
+// 	return !abb_iter_in_al_final(iter) ? iter->actual->clave : NULL;
+// }
 
 bool abb_iter_in_avanzar(abb_iter_t *iter){
     if (abb_iter_in_al_final(iter))
@@ -226,10 +249,10 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
     	
     	return true;
 }
-bool abb_iter_in_al_final(const abb_iter_t *iter){
-	return !iter->actual;
-} // caso 2
 
 void abb_iter_in_destruir(abb_iter_t* iter){
+	pila_destruir(iter->abb->raiz);
     free(iter);
 }
+
+
