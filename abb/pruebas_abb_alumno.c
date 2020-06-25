@@ -8,7 +8,9 @@
 #include <unistd.h>  
 
 
+void pruebas_generales(){
 
+}
 
 
 
@@ -23,4 +25,5 @@
 
 void pruebas_abb_alumno(void){
     //Aca llamar a todas las funciones de pruebas
+    pruebas_generales();
 }
