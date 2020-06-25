@@ -90,9 +90,9 @@ En borrar -> devuelve la posicion en que esta para luego proceder como se deba e
 */
 nodo_abb_t* buscar(nodo_abb_t *raiz,const char *clave,abb_comparar_clave_t cmp){
 	if(!raiz)
-		return raiz;
-	if(cmp(raiz->clave,clave) == 0)
 		return NULL;
+	if(cmp(raiz->clave,clave) == 0)
+		return raiz;
 	else if(cmp(raiz->clave,clave) < 0)
 		return buscar(raiz->izq,clave,cmp);
 	else if(cmp(raiz->clave,clave) > 0)
@@ -112,27 +112,45 @@ void inorder(nodo_abb_t *raiz)
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol)	return false;
 
-	if()
-	nodo_abb_t *nodo = nodo_abb_crear(clave,dato);
+	nodo_abb_t *ultimo = buscar(arbol->raiz,clave,arbol->comparar);
+	if(arbol->comparar(clave,ultimo->clave)){
+	 	if(arbol->destruir)
+			arbol->destruir(ultimo->dato); 	
+	 	ultimo->dato = nodo->dato;
+	}	// HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
+	
+	else{
+		nodo_abb_t *nodo = nodo_abb_crear(clave,dato);
+		if(!nodo)
+			return false;
+	
+		if(!ultimo) // EL ARBOL NO TIENE HOJAS
+			arbol->raiz = nodo;
 
-	// if(!arbol->raiz){ //El arbol no tiene hojas por lo tanto la raiz es el nodo
-	// 	arbol->raiz = nodo;
-	// 	return true;
-	// }
-
-	// if(!abb_guadar_wrapper(arbol,raiz,nodo)){
-	// 	destruir(nodo->dato);
-	// 	free(nodo->clave);
-	// 	free(nodo);
-	// 	return false;
-	// } // HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
-    
+	    else if(arbol->comparar(clave,ultimo->clave) <= MENOR) //está en izquierda
+    		ultimo->izq = nodo;
+    	else ultimo->der = nodo; // la clave es mas grande por lo tanto lo pongo a la derecha
+    }
     return true;
 }
 
 
 void *abb_borrar(abb_t *arbol, const char *clave){
-    return NULL;
+	if(!arbol)
+	    return NULL;
+
+	nodo_abb_t *borrado = buscar(arbol->raiz,clave,arbol->comparar);
+	if(!borrado)
+		return NULL; //No encontré la clave
+	void * dato = NULL;
+	if(!borrado->izq && !borrado-der){ //EL NODO NO TIENE HIJOS, OJALA FUESE EL UNICO CASO
+		dato = borrado->dato;
+		free(borrado->clave);
+		free(borrado);
+	}
+
+	else if((!borrado->izq && borrado->der) || (borrado->izq && !borrado->der)) // EL NODO TIENE UN HIJO.
+
 }
 
 //TENEMOS QUE ARMAR UN RECORRER PARA MODULARIZAR Y NO REPETIR CÓDIGO
@@ -159,8 +177,12 @@ void *abb_borrar(abb_t *arbol, const char *clave){
 void *abb_obtener(const abb_t *arbol, const char *clave){
 	if(!arbol)
 	    return NULL;
-	return abb_obtener_wrapper(arbol,arbol->raiz,clave);
+
+	nodo_abb_t *obtenido = buscar(arbol->raiz,clave,arbol->comparar);
+    return obtenido ? obtenido->dato : NULL;
 }
+
+//	return abb_obtener_wrapper(arbol,arbol->raiz,clave);
 
 // bool abb_pertenece_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave){ //RESPETA EL RECORRIDO IN ORDER (IZQ-RAIZ-DER)
 // 	if(!raiz)
@@ -182,8 +204,11 @@ void *abb_obtener(const abb_t *arbol, const char *clave){
 // }
 bool abb_pertenece(const abb_t *arbol, const char *clave){
 	if(!arbol)
-		return false;
-	return abb_pertenece_wrapper(arbol,arbol->raiz,clave);
+	    return false;
+
+	nodo_abb_t *obtenido = buscar(arbol->raiz,clave,arbol->comparar);
+	return obtenido; //si existe devuelve true si no existe devuelve false;
+
 }
 
 size_t abb_cantidad(abb_t *arbol){
