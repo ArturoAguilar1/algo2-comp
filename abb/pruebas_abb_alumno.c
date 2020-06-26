@@ -7,9 +7,9 @@
 #include <string.h>
 #include <unistd.h>  
 
-void imprimir_strings(void * str){
-    printf(" %s \n",(char*)str);
-}
+// void imprimir_strings(void * str){
+//     printf(" %s \n",(char*)str);
+// }
 
 void pruebas_guardar(){
     abb_t* abb = abb_crear(strcmp,NULL);
@@ -24,7 +24,7 @@ void pruebas_guardar(){
 
     printf("Cantidad: %zu \n",abb_cantidad(abb));
 
-    imprimir_arbol(abb,imprimir_strings);
+    //imprimir_arbol(abb,imprimir_strings);
 
 }
 
