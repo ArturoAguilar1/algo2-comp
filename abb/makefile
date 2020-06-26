@@ -1,5 +1,5 @@
 EXEC = abb
-CFILES = abb.c testing.c main.c pruebas_abb_alumno.c pila.c
+CFILES = abb.c testing.c main_abb.c pruebas_abb_alumno.c pila.c
 HFILES = abb.h testing.h pila.h
 
 CC = gcc

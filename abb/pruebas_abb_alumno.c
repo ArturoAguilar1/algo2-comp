@@ -7,8 +7,20 @@
 #include <string.h>
 #include <unistd.h>  
 
+void imprimir_strings(char * str){
+    printf(" %s \n",(char*)str);
+}
 
-void pruebas_generales(){
+void pruebas_guardar(){
+    abb_t* abb = abb_crear(strcmp,NULL);
+
+    char *clave1 = "perro", *valor1 = "guau";
+    char *clave2 = "gato", *valor2 = "miau";
+    char *clave3 = "vaca", *valor3 = "mu";
+
+    print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1));
+    print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2, valor2));
+    print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3, valor3));
 
 }
 
@@ -25,5 +37,5 @@ void pruebas_generales(){
 
 void pruebas_abb_alumno(void){
     //Aca llamar a todas las funciones de pruebas
-    pruebas_generales();
+    pruebas_guardar();
 }

@@ -15,23 +15,30 @@ struct abb{
     nodo_abb_t *raiz;
     size_t cantidad;
     abb_destruir_dato_t destruir;
-    //Comparar define si tengo que ir a derecha o a izquierda para buscar mi dato, si da == 0 entonces es el dato
     abb_comparar_clave_t comparar;
 };
 
 struct abb_iter{
     const abb_t *abb;
-    nodo_abb_t actual; 
+    pila_t *pila;
 };
 
-nodo_abb_t *nodo_abb_crear(const char *clave, void *dato){
-	nodo_abb_t *nodo = malloc(sizeof(nodo_abb_t));
-	if(!nodo)
-		return false;
-	
-	nodo->clave = strdup(clave);
-	nodo->dato = dato;
 
+void inorder(nodo_abb_t *raiz,void print(void*)){
+    if(raiz!=NULL) 
+    {
+        inorder(raiz->izq,print);
+        print(raiz->dato); 
+        inorder(raiz->der,print);
+    }
+}
+
+nodo_abb_t *abb_nodo_crear(const char *clave, void *dato){
+	nodo_abb_t *nodo = malloc(sizeof(nodo_abb_t));
+	nodo->clave = strdup(clave);
+	if(!nodo || !nodo->clave)	return false;
+	
+	nodo->dato = dato;
 	nodo->der = NULL;
 	nodo->izq = NULL;
 
@@ -41,12 +48,7 @@ nodo_abb_t *nodo_abb_crear(const char *clave, void *dato){
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     abb_t *abb = malloc(sizeof(abb_t));
     if(!abb)    return NULL;
-    
-    // abb->raiz = malloc(sizeof(nodo_abb_t));
-    // if(!abb->raiz){
-    //     free(abb);
-    //     return NULL;
-    // }
+
     abb->raiz = NULL;
 
     abb->cantidad = 0;
@@ -56,81 +58,42 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     return abb;
 }
 
-
-bool abb_guadar_wrapper(abb_t *arbol, nodo_abb_t *raiz, nodo_abb_t *nodo){
-	if(!comparar(raiz->clave,nodo->clave)) // UN NODO YA EXISTENTE TIENE LA MISMA CLAVE
-		return false;
-	
-	if(comparar(nodo->clave,raiz->clave) <= MENOR){ //El nodo está en un valor mas chico que la raiz, tengo que doblar a la izq
-		if(!raiz->izq){ // EL IZQUIERDO DE LA RAIZ NO ESTÁ POR LO TANTO AHORA EL IZQUIERDO APUNTA A ESTE NODO
-			raiz->izq = nodo;
-			return true;
-		}
-		else 
-			abb_guadar_wrapper(arbol,raiz->izq,nodo); // LA RAIZ IZQUIERDA EXISTE POR LO TANTO TENGO QUE SEGUIR BUSCANDO PERO PONGO COMO RAIZ A RAIZ->IZQ
-	} 
-	
-	if(comparar(nodo->clave,raiz->clave) >= MAYOR){ // ES IGUAL QUE EN RAIZ IZQUIERDA PERO AHORA ES PARA LA DERECHA
-		if(!raiz->der){
-			raiz->der = nodo;
-			return true;
-		}
-		else 
-			abb_guardar_wrapper(arbol,raiz->der,nodo);
-	}
-
-}
-
-/*Tengo la duda si la hacemos que devuelva un nodo_abb_t, o si tiene que devolver un entero o un bool.
-Osea, esta la tenemos que usar en las 4 primitivas, busca y devuelve si lo encontró u no.
-En guardar-> si encuentra el lugar donde meterlo devolveria ese nodo e inserto el nuevo nodo a izq o der del nodo que devuevle.
-En pertence-> true o false
-En obtener-> devuelve el dato que tiene ese nodo
-En borrar -> devuelve la posicion en que esta para luego proceder como se deba en borrar.
-*/
-nodo_abb_t* buscar(nodo_abb_t *raiz,const char *clave,abb_comparar_clave_t cmp){
-	if(!raiz)
-		return NULL;
+nodo_abb_t* abb_nodo_buscar(nodo_abb_t *raiz,const char *clave,abb_comparar_clave_t cmp){
+	nodo_abb_t *aux = raiz;
+	if(!aux)	return NULL;
 	if(cmp(raiz->clave,clave) == 0)
-		return raiz;
-	else if(cmp(raiz->clave,clave) < 0)
-		return buscar(raiz->izq,clave,cmp);
-	else if(cmp(raiz->clave,clave) > 0)
-		return buscar(raiz->der,clave,cmp);	
+		return aux;
+	else if(cmp(aux->clave,clave) < 0)
+		return buscar(aux->izq,clave,cmp);
+	else
+		return buscar(aux->der,clave,cmp);	
 }
 
-void inorder(nodo_abb_t *raiz)
-{
-    if(raiz!=NULL) // checking if the raiz is not null
-    {
-        inorder(raiz->izq); // visiting left child
-        printf(" %d ", *(int*)raiz->dato); // printing data at raiz
-        inorder(raiz->der);// visiting right child
-    }
-}
+
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol)	return false;
+	//El arbol esta vacio
+	if(arbol->raiz == NULL){
+		nodo_abb_t *nodo_insertar = nodo_abb_crear(clave,dato);
+		if(!nodo_insertar)	return false;
+		arbol->raiz = nodo_insertar;
+	}
 
-	nodo_abb_t *ultimo = buscar(arbol->raiz,clave,arbol->comparar);
-	if(arbol->comparar(clave,ultimo->clave)){
+	nodo_abb_t *nodo_buscado = buscar(arbol->raiz,clave,arbol->comparar);
+	if(nodo_buscado != NULL){
 	 	if(arbol->destruir)
-			arbol->destruir(ultimo->dato); 	
-	 	ultimo->dato = nodo->dato;
+			arbol->destruir(nodo_buscado->dato); 	
+	 	nodo_buscado->dato = dato;
+		return true;
 	}	// HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
-	
 	else{
-		nodo_abb_t *nodo = nodo_abb_crear(clave,dato);
-		if(!nodo)
-			return false;
-	
-		if(!ultimo) // EL ARBOL NO TIENE HOJAS
-			arbol->raiz = nodo;
-
-	    else if(arbol->comparar(clave,ultimo->clave) <= MENOR) //está en izquierda
-    		ultimo->izq = nodo;
-    	else ultimo->der = nodo; // la clave es mas grande por lo tanto lo pongo a la derecha
+		nodo_abb_t *nodo_insertar = nodo_abb_crear(clave,dato);
+		if(!nodo_insertar)	return false;
+		nodo_buscado = nodo_insertar;
     }
+
+	arbol->cantidad++;
     return true;
 }
 
@@ -143,36 +106,17 @@ void *abb_borrar(abb_t *arbol, const char *clave){
 	if(!borrado)
 		return NULL; //No encontré la clave
 	void * dato = NULL;
-	if(!borrado->izq && !borrado-der){ //EL NODO NO TIENE HIJOS, OJALA FUESE EL UNICO CASO
+	if(!borrado->izq && !borrado->der){ //EL NODO NO TIENE HIJOS, OJALA FUESE EL UNICO CASO
 		dato = borrado->dato;
 		free(borrado->clave);
 		free(borrado);
 	}
 
-	else if((!borrado->izq && borrado->der) || (borrado->izq && !borrado->der)) // EL NODO TIENE UN HIJO.
+	else if((!borrado->izq && borrado->der) || (borrado->izq && !borrado->der))
+		return; // EL NODO TIENE UN HIJO.
 
 }
 
-//TENEMOS QUE ARMAR UN RECORRER PARA MODULARIZAR Y NO REPETIR CÓDIGO
-
-// bool abb_obtener_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave){
-// 	if(!raiz)
-// 		return NULL;
-
-
-// 	if(raiz->comparar(clave,raiz->clave) <= MENOR){
-// 		return abb_pertenece(arbol,raiz->izq,clave);
-// 	} // me tengo que ir al izquierdo
-	
-// 	if(!arbol->comparar(raiz->clave,clave))
-// 		return raiz->dato; //Encontré el dato
-
-// 	if(arbol->comparar(clave,raiz->clave) >= MAYOR){
-// 		return abb_pertenece(arbol,raiz->der,clave);
-// 	} // me tengo que ir al derecho
-
-//     return NULL;
-// }
 
 void *abb_obtener(const abb_t *arbol, const char *clave){
 	if(!arbol)
@@ -182,26 +126,6 @@ void *abb_obtener(const abb_t *arbol, const char *clave){
     return obtenido ? obtenido->dato : NULL;
 }
 
-//	return abb_obtener_wrapper(arbol,arbol->raiz,clave);
-
-// bool abb_pertenece_wrapper(const abb_t *arbol,nodo_abb_t *raiz,const char *clave){ //RESPETA EL RECORRIDO IN ORDER (IZQ-RAIZ-DER)
-// 	if(!raiz)
-// 		return false; 
-
-// 	if(raiz->comparar(clave,raiz->clave) <= MENOR){
-// 		return abb_pertenece_wrapper(arbol,raiz->izq,clave);
-// 	} // me tengo que ir al izquierdo
-
-// 	if(!arbol->comparar(raiz->clave,clave))
-// 		return true; //Encontré la clave
-
-
-// 	if(arbol->comparar(clave,raiz->clave) >= MAYOR){
-// 		return abb_pertenece_wrapper(arbol,raiz->der,clave);
-// 	} // me tengo que ir al derecho
-	
-//     return false;
-// }
 bool abb_pertenece(const abb_t *arbol, const char *clave){
 	if(!arbol)
 	    return false;
