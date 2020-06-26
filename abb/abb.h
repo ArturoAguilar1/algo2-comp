@@ -8,7 +8,7 @@ typedef struct abb abb_t;
 typedef int (*abb_comparar_clave_t) (const char *, const char *);
 typedef void (*abb_destruir_dato_t) (void *);
 
-// void inorder(nodo_abb_t *raiz,void print(void*));
+void imprimir_arbol(abb_t *arbol,void print(void*));
 
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato);
 
@@ -37,6 +37,4 @@ void abb_iter_in_destruir(abb_iter_t* iter);
 
 
 
-#endif ABB_H
-
-
+#endif // ABB_H
