@@ -67,20 +67,48 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     return abb;
 }
 
-nodo_abb_t* abb_nodo_buscar(nodo_abb_t *raiz,const char *clave,abb_comparar_clave_t cmp){
+// nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_clave_t cmp){
+// 	//nodo_abb_t *aux = *raiz;
+// 	if(!aux)
+// 		return NULL;
+
+// 	if(!cmp(aux->clave,clave))
+// 		return raiz;
+
+// 	// else if(cmp(clave,raiz->clave) < 0 && raiz->izq)
+// 	// 	return abb_nodo_buscar(raiz->izq,clave,cmp);
+	
+// 	// else if(raiz->der)
+// 	// 	return abb_nodo_buscar(raiz->der,clave,cmp);		
+	
+// 	else if(cmp(clave,aux->clave) < 0){
+// 		if(!aux->izq)
+// 			return &aux->izq;
+// 		return abb_nodo_buscar(&aux->izq,clave,cmp);
+// 	}
+// 	else{
+// 		if(!aux->der)
+// 			return &aux->der;
+// 		return abb_nodo_buscar(&aux->der,clave,cmp);		
+// 	}
+// }
+nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_clave_t cmp){
 	if(!raiz)
 		return NULL;
 
-	if(!cmp(raiz->clave,clave))
-		return raiz;
-
-	else if(cmp(clave,raiz->clave) < 0 && raiz->izq)
-		return abb_nodo_buscar(raiz->izq,clave,cmp);
+	if(!cmp((*raiz)->clave,clave))
+		return raiz;	
 	
-	else if(raiz->der)
-		return abb_nodo_buscar(raiz->der,clave,cmp);		
-	
-	return raiz;
+	else if(cmp(clave,(*raiz)->clave) < 0){
+		if(!(*raiz)->izq)
+			return &(*raiz)->izq;
+		return abb_nodo_buscar(&(*raiz)->izq,clave,cmp);
+	}
+	else{
+		if(!(*raiz)->der)
+			return &(*raiz)->der;
+		return abb_nodo_buscar(&(*raiz)->der,clave,cmp);		
+	}
 }
 
 void imprimir_strings(void * str){
@@ -89,27 +117,46 @@ void imprimir_strings(void * str){
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol)	return false;
-
-	nodo_abb_t *nodo_buscado = abb_nodo_buscar(arbol->raiz,clave,arbol->comparar);
-	if(arbol->raiz && !arbol->comparar(nodo_buscado->clave,clave)){
-	 	if(arbol->destruir)
-			arbol->destruir(nodo_buscado->dato); 	
-	 	nodo_buscado->dato = dato;
+	if(!arbol->raiz){
+		nodo_abb_t* nodo = abb_nodo_crear(clave,dato);
+		if(!nodo)	return false;
+		arbol->raiz = nodo;
+		arbol->cantidad++;
 		return true;
-	}	// HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
+	}
+	/*
+	// nodo_abb_t *nodo_buscado = abb_nodo_buscar(arbol->raiz,clave,arbol->comparar);
+	// if(arbol->raiz && !arbol->comparar(nodo_buscado->clave,clave)){
+	//  	if(arbol->destruir)
+	// 		arbol->destruir(nodo_buscado->dato); 	
+	//  	nodo_buscado->dato = dato;
+	// 	return true;
+	// }	// HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
 
-	nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
-		if(!nodo_insertar)	return false;
+	// nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
+	// 	if(!nodo_insertar)	return false;
 		
-	if(!nodo_buscado)
-		arbol->raiz = nodo_insertar;
+	// if(!nodo_buscado)
+	// 	arbol->raiz = nodo_insertar;
 
-	else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) < 0)
-		nodo_buscado->izq = nodo_insertar;
+	// else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) < 0)
+	// 	nodo_buscado->izq = nodo_insertar;
 	
 
-	else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) > 0)
-		nodo_buscado->der = nodo_insertar;
+	// else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) > 0)
+	// 	nodo_buscado->der = nodo_insertar;
+	*/
+	nodo_abb_t **nodo_buscado = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
+	if(*nodo_buscado != NULL){
+	 	if(arbol->destruir)
+			arbol->destruir((*nodo_buscado)->dato); 	
+	 	(*nodo_buscado)->dato = dato;
+		return true;
+	}
+	nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
+	if(!nodo_insertar)	return false;
+	*nodo_buscado = nodo_insertar;
+	
     
     imprimir_arbol(arbol,imprimir_strings);
 	
