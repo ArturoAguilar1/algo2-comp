@@ -92,28 +92,6 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 		arbol->cantidad++;
 		return true;
 	}
-	/*
-	// nodo_abb_t *nodo_buscado = abb_nodo_buscar(arbol->raiz,clave,arbol->comparar);
-	// if(arbol->raiz && !arbol->comparar(nodo_buscado->clave,clave)){
-	//  	if(arbol->destruir)
-	// 		arbol->destruir(nodo_buscado->dato); 	
-	//  	nodo_buscado->dato = dato;
-	// 	return true;
-	// }	// HAY UN NODO YA EXISTENTE QUE YA TIENE LA MISMA CLAVE.
-
-	// nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
-	// 	if(!nodo_insertar)	return false;
-		
-	// if(!nodo_buscado)
-	// 	arbol->raiz = nodo_insertar;
-
-	// else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) < 0)
-	// 	nodo_buscado->izq = nodo_insertar;
-	
-
-	// else if(arbol->comparar(nodo_insertar->clave,nodo_buscado->clave) > 0)
-	// 	nodo_buscado->der = nodo_insertar;
-	*/
 	nodo_abb_t **nodo_buscado = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
 	if(*nodo_buscado != NULL){
 	 	if(arbol->destruir)
@@ -134,7 +112,6 @@ nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 	while(aux_min->izq != NULL){
 		aux_min = aux_min->izq;
 	}
-	//return strdup(aux_min->clave);
 	return aux_min;
 }
 
@@ -158,12 +135,14 @@ void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 		free(aux_borrar->clave);
 		free(aux_borrar);
 	}else{
+		aux_dato = aux_borrar->dato;
 		nodo_abb_t *reemplazo = buscar_reemplazante((*nodo_borrar)->der);
 		char *clave_pisar = strdup(reemplazo->clave);
-		aux_dato = abb_borrar(arbol,reemplazo->clave);
+		void *dato_reemplazo = abb_borrar(arbol,reemplazo->clave);
+		arbol->cantidad++;
 		free((*nodo_borrar)->clave);
 		(*nodo_borrar)->clave = clave_pisar;
-		(*nodo_borrar)->dato = aux_dato;
+		(*nodo_borrar)->dato = dato_reemplazo;
 	}
 	return aux_dato;
 }
@@ -173,7 +152,6 @@ void *abb_borrar(abb_t *arbol, const char *clave){
 	nodo_abb_t **nodo_borrar = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
 	if(!(*nodo_borrar))
 	 	return NULL; //No encontré la clave
-
 	void *dato = borrar_nodo(arbol,nodo_borrar,clave);
 	arbol->cantidad--;
 	return dato;
@@ -201,15 +179,14 @@ void abb_destruir_wrapper(abb_t *arbol, nodo_abb_t * raiz){
 	
 	if(raiz && raiz->izq)
 		abb_destruir_wrapper(arbol,raiz->izq);
-	// me tengo que ir al izquierdo
 	
 	if(raiz && raiz->der)
 		abb_destruir_wrapper(arbol,raiz->der);
-	 // me tengo que ir al derecho
 	
-	if(raiz){ // estoy en una hoja , tengo que liberar de abajo para arriba, CREO QUE NO ES NECESARIO PREGUNTAR SI RAIZ EXISTE, PERO COMO DIJIMOS A PRINCIPIO HAGAMOSLO TODO RUSTICO
-		if(arbol->destruir)
+	if(raiz){ 
+		if(arbol->destruir != NULL){
 			arbol->destruir(raiz->dato);
+		}
 		free(raiz->clave);
 		free(raiz);
 	}
