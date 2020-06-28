@@ -7,6 +7,8 @@
 #include <string.h>
 #include <unistd.h>  
 
+#define MAX 5000
+
 void imprimir_strings(void * str){
     printf(" %s \n",(char*)str);
 }
@@ -38,7 +40,7 @@ void imprimir_iter_externo(abb_t *arbol){
     abb_iter_t *abb_iter = abb_iter_in_crear(arbol);
     while(!abb_iter_in_al_final(abb_iter)){
         const char *aux = abb_iter_in_ver_actual(abb_iter);
-        printf("%s \n",aux);
+        printf("%s -> ",aux);
         
         abb_iter_in_avanzar(abb_iter);
     }
@@ -48,28 +50,45 @@ void imprimir_iter_externo(abb_t *arbol){
 void pruebas_debug(){
     abb_t* abb = abb_crear(comparar_enteros,NULL);
 
-    char *clave1 = "10";//, *valor1 = "guau";
-    char *clave2 = "7";//, *valor2 = "miau";
-    char *clave3 = "15";//, *valor3 = "mu";
-    int v[10] = {10,7,15,3,1,5,15,13,12,2};
-    
-    print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, &v[0]));
-    print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2,&v[1]));
-    print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3,&v[2]));
-    print_test("Prueba abb insertar clave1", abb_guardar(abb, "3", &v[3]));
-    print_test("Prueba abb insertar clave2", abb_guardar(abb, "1", &v[4]));
-    print_test("Prueba abb insertar clave3", abb_guardar(abb, "5",&v[5]));
-    print_test("Prueba abb insertar clave1", abb_guardar(abb, "15", &v[6]));
-    print_test("Prueba abb insertar clave2", abb_guardar(abb, "13",&v[7]));
-    print_test("Prueba abb insertar clave3", abb_guardar(abb, "12", &v[8]));
-    print_test("La cantidad coincide", abb_cantidad(abb) == 8);
-//    printf("Cantidad: %zu \n",abb_cantidad(abb));
-    printf("Iter Interno\n");
-    imprimir_arbol(abb,imprimir_strings);
+    // char *clave1 = "10";//, *valor1 = "guau";
+    // char *clave2 = "7";//, *valor2 = "miau";
+    // char *clave3 = "15";//, *valor3 = "mu";
+    //int v[10] = {10,7,15,3,1,5,15,13,12,2};
+    int v[MAX];
 
+    printf("Desordenado:\n");
+    for(size_t i = 0; i < MAX; i++){
+        v[i] = rand() % 5000;
+        printf(" %d ",v[i]);
+    }
+    printf("\n");
+    const int largo_clave = 10;
+    char (*claves)[largo_clave] = malloc(MAX * largo_clave);
 
-    printf("\nIter Externo\n");
+    for(int i = 0; i < MAX; i++){
+        sprintf(claves[i], "%d", v[i]);
+        abb_guardar(abb,claves[i],&v[i]);
+    }
+    printf("Recorrido del arbol en inorder, ordenado:\n");
     imprimir_iter_externo(abb);
+    free(claves);
+    // print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, &v[0]));
+    // print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2,&v[1]));
+    // print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3,&v[2]));
+    // print_test("Prueba abb insertar clave1", abb_guardar(abb, "3", &v[3]));
+    // print_test("Prueba abb insertar clave2", abb_guardar(abb, "1", &v[4]));
+    // print_test("Prueba abb insertar clave3", abb_guardar(abb, "5",&v[5]));
+    // print_test("Prueba abb insertar clave1", abb_guardar(abb, "15", &v[6]));
+    // print_test("Prueba abb insertar clave2", abb_guardar(abb, "13",&v[7]));
+    // print_test("Prueba abb insertar clave3", abb_guardar(abb, "12", &v[8]));
+    //print_test("La cantidad coincide", abb_cantidad(abb) == 8);
+//    printf("Cantidad: %zu \n",abb_cantidad(abb));
+    // printf("Iter Interno\n");
+    // imprimir_arbol(abb,imprimir_strings);
+
+
+    // printf("\nIter Externo\n");
+    // imprimir_iter_externo(abb);
 
     // abb_in_order(abb,visitar,&v[9]);
     // imprimir_arbol(abb,imprimir_enteros);
@@ -78,9 +97,9 @@ void pruebas_debug(){
     // abb_borrar(abb,"5");
     //abb_borrar(abb,"10");
     //abb_borrar(abb,"7");
-    printf("\n\n");
-    imprimir_arbol(abb,imprimir_strings);
-    printf("Cantidad: %zu \n",abb_cantidad(abb));
+    // printf("\n\n");
+    // imprimir_arbol(abb,imprimir_strings);
+    // printf("Cantidad: %zu \n",abb_cantidad(abb));
     abb_destruir(abb);
     //    imprimir_arbol(abb,imprimir_strings);
 }
@@ -466,23 +485,23 @@ void prueba_iterar_abb_vacio()
 void pruebas_abb_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    //prueba_crear_abb_vacio(); //OK 
-   //prueba_iterar_abb_vacio(); //OK 
-    // prueba_abb_insertar(); //OK 
-   // prueba_abb_reemplazar(); //OK 
-   //  prueba_abb_reemplazar_con_destruir(); //OK 
-     //prueba_abb_borrar(); //OK 
-     //prueba_abb_clave_vacia(); //OK 
-    // prueba_abb_valor_null(); //OK 
-    //prueba_abb_volumen(5000, true); //OK 
-     //prueba_abb_iterar(); //OK 
-     //prueba_abb_iterar_volumen(5000); //OK 
+    // prueba_crear_abb_vacio(); //OK && VALGRIND
+    // prueba_iterar_abb_vacio(); //OK && VALGRIND
+    // prueba_abb_insertar(); //OK && VALGRIND
+    // prueba_abb_reemplazar(); //OK && VALGRIND
+    // prueba_abb_reemplazar_con_destruir(); //OK && VALGRIND
+    // prueba_abb_borrar(); //OK && VALGRIND 
+    // prueba_abb_clave_vacia(); //OK && VALGRIND
+    // prueba_abb_valor_null(); //OK && VALGRIND 
+    //prueba_abb_volumen(5000, true); //OK //ERROR EN VALGRIND
+     //prueba_abb_iterar(); //OK && VALGRIND
+    prueba_abb_iterar_volumen(5000); //OK 
 }
 
 
 void pruebas_abb_alumno(void){
     //Aca llamar a todas las funciones de pruebas
-    //pruebas_debug();
-    pruebas_abb_catedra();
+    pruebas_debug();
+   // pruebas_abb_catedra();
 }
 

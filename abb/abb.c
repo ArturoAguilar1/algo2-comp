@@ -57,7 +57,6 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     if(!abb)    return NULL;
 
     abb->raiz = NULL;
-
     abb->cantidad = 0;
     abb->comparar = cmp;
     abb->destruir = destruir_dato;
@@ -65,31 +64,6 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     return abb;
 }
 
-// nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_clave_t cmp){
-// 	//nodo_abb_t *aux = *raiz;
-// 	if(!aux)
-// 		return NULL;
-
-// 	if(!cmp(aux->clave,clave))
-// 		return raiz;
-
-// 	// else if(cmp(clave,raiz->clave) < 0 && raiz->izq)
-// 	// 	return abb_nodo_buscar(raiz->izq,clave,cmp);
-	
-// 	// else if(raiz->der)
-// 	// 	return abb_nodo_buscar(raiz->der,clave,cmp);		
-	
-// 	else if(cmp(clave,aux->clave) < 0){
-// 		if(!aux->izq)
-// 			return &aux->izq;
-// 		return abb_nodo_buscar(&aux->izq,clave,cmp);
-// 	}
-// 	else{
-// 		if(!aux->der)
-// 			return &aux->der;
-// 		return abb_nodo_buscar(&aux->der,clave,cmp);		
-// 	}
-// }
 nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_clave_t cmp){
 	if(!raiz)
 		return NULL;
@@ -111,7 +85,6 @@ nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_cl
 
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
-	if(!arbol)	return false;
 	if(!arbol->raiz){
 		nodo_abb_t* nodo = abb_nodo_crear(clave,dato);
 		if(!nodo)	return false;
@@ -244,9 +217,9 @@ void abb_destruir_wrapper(abb_t *arbol, nodo_abb_t * raiz){
 }
 
 void abb_destruir(abb_t *arbol){
-	if (!arbol)
-	    return;
-	abb_destruir_wrapper(arbol,arbol->raiz);
+	if(arbol->cantidad != 0){
+		abb_destruir_wrapper(arbol,arbol->raiz);
+	}
 	free(arbol);
 }
 
