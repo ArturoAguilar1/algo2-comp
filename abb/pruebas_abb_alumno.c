@@ -91,7 +91,7 @@ void prueba_crear_abb_vacio()
  
     print_test("Prueba abb crear abb vacio", abb);
     print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
-    //print_test("Prueba abb obtener clave A, es NULL, no existe", !abb_obtener(abb, "A"));
+    print_test("Prueba abb obtener clave A, es NULL, no existe", !abb_obtener(abb, "A"));
     print_test("Prueba abb pertenece clave A, es false, no existe", !abb_pertenece(abb, "A"));
     print_test("Prueba abb borrar clave A, es NULL, no existe", !abb_borrar(abb, "A"));
  
@@ -113,7 +113,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_insertar()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *clave1 = "perro", *valor1 = "guau";
     char *clave2 = "gato", *valor2 = "miau";
@@ -146,7 +146,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_reemplazar()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *clave1 = "perro", *valor1a = "guau", *valor1b = "warf";
     char *clave2 = "gato", *valor2a = "miau", *valor2b = "meaow";
@@ -173,7 +173,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_reemplazar_con_destruir()
 {
-    abb_t* abb = abb_crear(comparar_enteros,free);
+    abb_t* abb = abb_crear(strcmp,free);
  
     char *clave1 = "perro", *valor1a, *valor1b;
     char *clave2 = "gato", *valor2a, *valor2b;
@@ -186,11 +186,14 @@ void prueba_iterar_abb_vacio()
  
     /* Inserta 2 valores y luego los reemplaza (debe liberar lo que reemplaza) */
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1a));
+
     print_test("Prueba abb obtener clave1 es valor1a", abb_obtener(abb, clave1) == valor1a);
     print_test("Prueba abb obtener clave1 es valor1a", abb_obtener(abb, clave1) == valor1a);
     print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2, valor2a));
+
     print_test("Prueba abb obtener clave2 es valor2a", abb_obtener(abb, clave2) == valor2a);
     print_test("Prueba abb obtener clave2 es valor2a", abb_obtener(abb, clave2) == valor2a);
+
     print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
  
     print_test("Prueba abb insertar clave1 con otro valor", abb_guardar(abb, clave1, valor1b));
@@ -207,7 +210,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_borrar()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *clave1 = "perro", *valor1 = "guau";
     char *clave2 = "gato", *valor2 = "miau";
@@ -245,7 +248,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_clave_vacia()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *clave = "", *valor = "";
  
@@ -261,7 +264,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_valor_null()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *clave = "", *valor = NULL;
  
@@ -278,7 +281,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_volumen(size_t largo, bool debug)
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     const size_t largo_clave = 10;
     char (*claves)[largo_clave] = malloc(largo * largo_clave);
@@ -321,7 +324,7 @@ void prueba_iterar_abb_vacio()
  
     /* Destruye el abb y crea uno nuevo que sí libera */
     abb_destruir(abb);
-    abb = abb_crear(comparar_enteros,NULL);
+    abb = abb_crear(strcmp,NULL);
  
     /* Inserta 'largo' parejas en el abb */
     ok = true;
@@ -347,7 +350,7 @@ void prueba_iterar_abb_vacio()
  
  void prueba_abb_iterar()
 {
-    abb_t* abb = abb_crear(comparar_enteros,NULL);
+    abb_t* abb = abb_crear(strcmp,NULL);
  
     char *claves[] = {"perro", "gato", "vaca"};
     char *valores[] = {"guau", "miau", "mu"};
@@ -463,17 +466,17 @@ void prueba_iterar_abb_vacio()
 void pruebas_abb_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    prueba_crear_abb_vacio(); //OK && VALGRIND
-    //prueba_iterar_abb_vacio(); //OK && VALGRIND
-    // prueba_abb_insertar(); //OK && VALGRIND
-    // prueba_abb_reemplazar(); //OK && VALGRIND
-    // prueba_abb_reemplazar_con_destruir(); //OK && VALGRIND
-    // prueba_abb_borrar(); //OK && VALGRIND
-    // prueba_abb_clave_vacia(); //OK && VALGRIND
-    // prueba_abb_valor_null(); //OK && VALGRIND
-    // prueba_abb_volumen(5000, true); //OK && VALGRIND
-    // prueba_abb_iterar(); //OK && VALGRIND
-    // prueba_abb_iterar_volumen(5000); //OK && VALGRIND
+    //prueba_crear_abb_vacio(); //OK 
+   //prueba_iterar_abb_vacio(); //OK 
+    // prueba_abb_insertar(); //OK 
+   // prueba_abb_reemplazar(); //OK 
+   //  prueba_abb_reemplazar_con_destruir(); //OK 
+     //prueba_abb_borrar(); //OK 
+     //prueba_abb_clave_vacia(); //OK 
+    // prueba_abb_valor_null(); //OK 
+    //prueba_abb_volumen(5000, true); //OK 
+     //prueba_abb_iterar(); //OK 
+     //prueba_abb_iterar_volumen(5000); //OK 
 }
 
 
