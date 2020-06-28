@@ -109,9 +109,6 @@ nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_cl
 	}
 }
 
-// void imprimir_strings(void * str){
-//     printf(" %s \n",(char*)str);
-// }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol)	return false;
@@ -155,24 +152,9 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!nodo_insertar)	return false;
 	*nodo_buscado = nodo_insertar;
 	
-    
-    //imprimir_arbol(arbol,imprimir_strings);
-	
 	arbol->cantidad++;
     return true;
 }
-
-// nodo_abb_t *minimo(nodo_abb_t *nodo){
-// 	nodo_abb_t *aux = nodo;
-// 	if(aux->izq != NULL)
-// 		aux->izq = minimo(nodo->izq);
-
-// 	return aux;
-// 	// if(!nodo->izq)	
-// 	// 	return nodo;
-// 	// else
-// 	// 	nodo->izq = minimo(nodo->izq);
-// }
 
 nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 	nodo_abb_t *aux_min = nodo;
@@ -186,7 +168,6 @@ nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 	void *aux_dato = NULL;
 	nodo_abb_t *aux_borrar = *nodo_borrar;
-	//Hoja
 	if(!aux_borrar->izq && !aux_borrar->der){
 		aux_dato = aux_borrar->dato;
 		free(aux_borrar->clave);
@@ -204,14 +185,11 @@ void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 		free(aux_borrar->clave);
 		free(aux_borrar);
 	}else{
-		//char *clave_pisar = buscar_reemplazante((*nodo_borrar)->der);
 		nodo_abb_t *reemplazo = buscar_reemplazante((*nodo_borrar)->der);
 		char *clave_pisar = strdup(reemplazo->clave);
-		printf("Obtuve clave: %s \n",clave_pisar);
 		aux_dato = abb_borrar(arbol,reemplazo->clave);
-		printf("nodo borrar antes: %s \n",(char*)(*nodo_borrar)->clave);
+		free((*nodo_borrar)->clave);
 		(*nodo_borrar)->clave = clave_pisar;
-		printf("nodo borrar despues de pisar: %s \n",(char*)(*nodo_borrar)->clave);
 		(*nodo_borrar)->dato = aux_dato;
 	}
 	return aux_dato;
@@ -220,34 +198,23 @@ void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 void *abb_borrar(abb_t *arbol, const char *clave){
 	if(!arbol)	return NULL;
 	nodo_abb_t **nodo_borrar = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
-	printf("raiz queda en: %s \n",(char*)arbol->raiz->clave);
 	if(!(*nodo_borrar))
 	 	return NULL; //No encontré la clave
+
 	void *dato = borrar_nodo(arbol,nodo_borrar,clave);
 	arbol->cantidad--;
 	return dato;
 }
 
-
-
-
-// 	// if(!borrado->izq && !borrado->der){ //EL NODO NO TIENE HIJOS, OJALA FUESE EL UNICO CASO
-// 	// 	dato = borrado->dato;
-// 	// 	free(borrado->clave);
-// 	// 	free(borrado);
-// 	// }
-
-// 	// else if((!borrado->izq && borrado->der) || (borrado->izq && !borrado->der))
-// 	// 	return; // EL NODO TIENE UN HIJO.
-// 	return dato;
-// }
-
-
 void *abb_obtener(const abb_t *arbol, const char *clave){
 	if(!arbol)	return NULL;
 	nodo_abb_t *aux_raiz = arbol->raiz;
 	nodo_abb_t **obtenido = abb_nodo_buscar(&aux_raiz,clave,arbol->comparar);
-    return *obtenido ? (*obtenido)->dato : NULL;
+	if(*obtenido)
+		return (*obtenido)->dato;
+	else 
+		return NULL;
+    //return *obtenido ? (*obtenido)->dato : NULL;
 }
 
 bool abb_pertenece(const abb_t *arbol, const char *clave){
@@ -306,75 +273,63 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 
 //Iterador Externo
 
+//Iterador Externo
+bool abb_apilar_izq(nodo_abb_t *raiz,abb_iter_t *iter){
+    if(!raiz)
+        return true;
+    if(!pila_apilar(iter->pila,raiz))
+        return false;
+    return abb_apilar_izq(raiz->izq,iter);
+}
+ 
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
+   
     abb_iter_t *abb_iter = malloc(sizeof(abb_iter_t));
     if(!abb_iter)   return NULL;
-
-	abb_iter->pila = pila_crear();
-	if(!abb_iter->pila){
-		free(abb_iter);
-		return NULL;
-	}
-	//pila_apilar();
-
-
+ 
+    abb_iter->pila = pila_crear();
+    if(!abb_iter->pila){
+        free(abb_iter);
+        return NULL;
+    }
     abb_iter->abb = arbol;
-
-
+    if(!abb_apilar_izq(arbol->raiz,abb_iter)){
+        pila_destruir(abb_iter->pila);
+        free(abb_iter);
+        return NULL;
+    }
+ 
     return abb_iter;
 }
-
-
-// bool abb_iter_in_avanzar(abb_iter_t *iter){
-//     if (abb_iter_in_al_final(iter))
-//     	return false;
-
-//     	if(iter->actual->izq)
-//     		iter->actual = iter->actual -> izq;
-//     	else if(iter->actual->der)
-// 	    	iter->actual = iter->actual -> der; // 
-    	
-//     	return true;
-// }
-
-// bool abb_iter_in_al_final(const abb_iter_t *iter){
-// 	return (!iter->actual || (!iter->actual->izq && !iter->actual->der))
-// }
-// // Hay dos casos que considerar, este es el caso 1 que te lo explico por wp 
-
-// bool abb_iter_in_al_final(const abb_iter_t *iter){
-// 	return !iter->actual;
-// } // caso 2
+ 
+bool abb_iter_in_avanzar_nodo(abb_iter_t *iter,nodo_abb_t *raiz){
+    if(!raiz)
+        return true;
+    if(!abb_apilar_izq(raiz,iter))
+        return false;
+	return true;
+}
+ 
+bool abb_iter_in_avanzar(abb_iter_t *iter){
+    if(abb_iter_in_al_final(iter))
+        return false;
+    nodo_abb_t *aux = pila_desapilar(iter->pila);
+    if(!abb_iter_in_avanzar_nodo(iter,aux->der))
+        return false; // Esto hay que ver que onda porque ponele que falla en el medio del iterador, es como que se agregan cosas que no quería que se agregue, asi que hay que pegarle un ojo, por ahí borrar la pila debería ser
+    return true;
+}
 
 //Si la pila esta vacia, quiere decir que el iter llegó al final.
 bool abb_iter_in_al_final(const abb_iter_t *iter){
-	return pila_esta_vacia(iter->pila);
+    return pila_esta_vacia(iter->pila);
 }
-
+ 
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-	return (char*)pila_ver_tope(iter->pila);
+    nodo_abb_t *actual = pila_ver_tope(iter->pila);
+    return actual->clave;
 }
-
-
-// const char *abb_iter_in_ver_actual(const abb_iter_t *iter){
-// 	return !abb_iter_in_al_final(iter) ? iter->actual->clave : NULL;
-// }
-
-// bool abb_iter_in_avanzar(abb_iter_t *iter){
-//     if (abb_iter_in_al_final(iter))
-//     	return false;
-
-//     	if(iter->actual->izq)
-//     		iter->actual = iter->actual -> izq;
-//     	else
-// 	    	iter->actual = iter->actual -> der; // 
-    	
-//     	return true;
-// }
-
+  
 void abb_iter_in_destruir(abb_iter_t* iter){
-	pila_destruir(iter->pila);
+    pila_destruir(iter->pila);
     free(iter);
 }
-
-
