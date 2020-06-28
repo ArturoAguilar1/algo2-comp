@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>  
 
-#define MAX 1000
+#define MAX 5000
 
 void pruebas_debug();
 
@@ -252,7 +252,6 @@ int aleatorio_en_rango(int minimo, int maximo) {
 }
 
 void desordenar_arreglo(int *v,int largo){
-
     for (int i = 0; i < largo; i++) {
         int indice_aleatorio = aleatorio_en_rango(0, largo - 1);
         int temporal = v[i];
@@ -296,10 +295,9 @@ void desordenar_arreglo(int *v,int largo){
         if (!ok) break;
     }
     
- 
      if (debug) print_test("Prueba abb pertenece y obtener muchos elementos", ok);
      if (debug) print_test("Prueba abb la cantidad de elementos es correcta", abb_cantidad(abb) == largo);
-    // printf("Cantidad: %zu \n",abb_cantidad(abb));
+
     // /* Verifica que borre y devuelva los valores correctos */
     for (size_t i = 0; i < largo; i++) {
         //void *aux = abb_borrar(abb, claves[i]);
@@ -311,13 +309,14 @@ void desordenar_arreglo(int *v,int largo){
     if (debug) print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
  
     // /* Destruye el abb y crea uno nuevo que sí libera */
-    //abb_destruir(abb);
+    // abb_destruir(abb);
     // abb = abb_crear(comparar_enteros,free);
  
     // // // // /* Inserta 'largo' parejas en el abb */
     // ok = true;
     // for (size_t i = 0; i < largo; i++) {
-    //     ok = abb_guardar(abb, claves[i], &v[i]);
+    //     sprintf(clave,"%d",v[i]); 
+    //     ok = abb_guardar(abb, clave, &v[i]);
     //     if (!ok) break;
     // }
  

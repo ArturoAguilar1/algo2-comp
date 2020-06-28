@@ -5,8 +5,6 @@
 
 #include "pila.h"
 
-#define MENOR -1
-#define MAYOR 1
 
 typedef struct nodo_abb{
     struct nodo_abb *izq;
@@ -39,6 +37,7 @@ void inorder(nodo_abb_t *raiz,void print(void*)){
 void imprimir_arbol(abb_t *arbol,void print(void*)){
 	inorder(arbol->raiz,print);
 }
+
 
 nodo_abb_t *abb_nodo_crear(const char *clave, void *dato){
 	nodo_abb_t *nodo = malloc(sizeof(nodo_abb_t));
@@ -82,7 +81,6 @@ nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_cl
 		return abb_nodo_buscar(&(*raiz)->der,clave,cmp);		
 	}
 }
-
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	if(!arbol->raiz){
@@ -176,7 +174,6 @@ size_t abb_cantidad(abb_t *arbol){
 }
 
 void abb_destruir_wrapper(abb_t *arbol, nodo_abb_t * raiz){
-	
 	if(raiz && raiz->izq)
 		abb_destruir_wrapper(arbol,raiz->izq);
 	
@@ -212,12 +209,9 @@ void abb_in_order_wrapper(nodo_abb_t *raiz, bool visitar(const char *, void *, v
 }
 
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
-	//nodo_abb_t *aux_raiz = arbol->raiz;
-	//Wrapper, porque inoder rcibe un abb_t* entonces para recorrer el arbol necesito nodo_abb*
 	abb_in_order_wrapper(arbol->raiz,visitar,extra);
 }
 
-//Iterador Externo
 
 //Iterador Externo
 bool abb_apilar_izq(nodo_abb_t *raiz,abb_iter_t *iter){
@@ -229,7 +223,6 @@ bool abb_apilar_izq(nodo_abb_t *raiz,abb_iter_t *iter){
 }
  
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
-   
     abb_iter_t *abb_iter = malloc(sizeof(abb_iter_t));
     if(!abb_iter)   return NULL;
  
@@ -243,8 +236,7 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
         pila_destruir(abb_iter->pila);
         free(abb_iter);
         return NULL;
-    }
- 
+    } 
     return abb_iter;
 }
  
@@ -261,11 +253,10 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
         return false;
     nodo_abb_t *aux = pila_desapilar(iter->pila);
     if(!abb_iter_in_avanzar_nodo(iter,aux->der))
-        return false; // Esto hay que ver que onda porque ponele que falla en el medio del iterador, es como que se agregan cosas que no quería que se agregue, asi que hay que pegarle un ojo, por ahí borrar la pila debería ser
+        return false; 
     return true;
 }
 
-//Si la pila esta vacia, quiere decir que el iter llegó al final.
 bool abb_iter_in_al_final(const abb_iter_t *iter){
     return pila_esta_vacia(iter->pila);
 }
