@@ -44,16 +44,15 @@ void pruebas_guardar(){
     
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, &v[0]));
     print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2,&v[1]));
-    print_test("Prueba abb inserta r clave3", abb_guardar(abb, clave3,&v[2]));
-        print_test("Prueba abb insertar clave1", abb_guardar(abb, "3", &v[3]));
+    print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3,&v[2]));
+    print_test("Prueba abb insertar clave1", abb_guardar(abb, "3", &v[3]));
     print_test("Prueba abb insertar clave2", abb_guardar(abb, "1", &v[4]));
-    print_test("Prueba abb inserta r clave3", abb_guardar(abb, "5",&v[5]));
-        print_test("Prueba abb insertar clave1", abb_guardar(abb, "15", &v[6]));
+    print_test("Prueba abb insertar clave3", abb_guardar(abb, "5",&v[5]));
+    print_test("Prueba abb insertar clave1", abb_guardar(abb, "15", &v[6]));
     print_test("Prueba abb insertar clave2", abb_guardar(abb, "13",&v[7]));
-    print_test("Prueba abb inserta r clave3", abb_guardar(abb, "12", &v[8]));
-
-
-    printf("Cantidad: %zu \n",abb_cantidad(abb));
+    print_test("Prueba abb insertar clave3", abb_guardar(abb, "12", &v[8]));
+    print_test("La cantidad coincide", abb_cantidad(abb) == 8);
+//    printf("Cantidad: %zu \n",abb_cantidad(abb));
 
     imprimir_arbol(abb,imprimir_strings);
 
@@ -62,7 +61,7 @@ void pruebas_guardar(){
 
     // abb_borrar(abb,"1");
     // abb_borrar(abb,"5");
-     abb_borrar(abb,"10");
+    abb_borrar(abb,"10");
     //abb_borrar(abb,"7");
     printf("\n\n");
     imprimir_arbol(abb,imprimir_strings);
