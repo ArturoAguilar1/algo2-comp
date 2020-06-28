@@ -5,6 +5,8 @@
 
 #include "pila.h"
 
+#define MENOR -1
+#define MAYOR 1
 
 typedef struct nodo_abb{
     struct nodo_abb *izq;
@@ -55,14 +57,12 @@ abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
     if(!abb)    return NULL;
 
     abb->raiz = NULL;
-
     abb->cantidad = 0;
     abb->comparar = cmp;
     abb->destruir = destruir_dato;
 
     return abb;
 }
-
 
 nodo_abb_t** abb_nodo_buscar(nodo_abb_t **raiz,const char *clave,abb_comparar_clave_t cmp){
 	if(!raiz)
@@ -112,7 +112,6 @@ nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 	while(aux_min->izq != NULL){
 		aux_min = aux_min->izq;
 	}
-
 	return aux_min;
 }
 
@@ -136,12 +135,14 @@ void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 		free(aux_borrar->clave);
 		free(aux_borrar);
 	}else{
+		aux_dato = aux_borrar->dato;
 		nodo_abb_t *reemplazo = buscar_reemplazante((*nodo_borrar)->der);
 		char *clave_pisar = strdup(reemplazo->clave);
-		aux_dato = abb_borrar(arbol,reemplazo->clave);
+		void *dato_reemplazo = abb_borrar(arbol,reemplazo->clave);
+		arbol->cantidad++;
 		free((*nodo_borrar)->clave);
 		(*nodo_borrar)->clave = clave_pisar;
-		(*nodo_borrar)->dato = aux_dato;
+		(*nodo_borrar)->dato = dato_reemplazo;
 	}
 	return aux_dato;
 }
@@ -151,7 +152,6 @@ void *abb_borrar(abb_t *arbol, const char *clave){
 	nodo_abb_t **nodo_borrar = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
 	if(!(*nodo_borrar))
 	 	return NULL; //No encontré la clave
-
 	void *dato = borrar_nodo(arbol,nodo_borrar,clave);
 	arbol->cantidad--;
 	return dato;
@@ -195,9 +195,9 @@ void abb_destruir_wrapper(abb_t *arbol, nodo_abb_t * raiz){
 }
 
 void abb_destruir(abb_t *arbol){
-	if (!arbol)
-	    return;
-	abb_destruir_wrapper(arbol,arbol->raiz);
+	if(arbol->cantidad != 0){
+		abb_destruir_wrapper(arbol,arbol->raiz);
+	}
 	free(arbol);
 }
 
