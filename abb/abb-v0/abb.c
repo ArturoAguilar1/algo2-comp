@@ -112,7 +112,7 @@ nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 	}
 	return aux_min;
 }
-/*
+
 void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 	void *aux_dato = NULL;
 	nodo_abb_t *aux_borrar = *nodo_borrar;
@@ -141,33 +141,6 @@ void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 		free((*nodo_borrar)->clave);
 		(*nodo_borrar)->clave = clave_pisar;
 		(*nodo_borrar)->dato = dato_reemplazo;
-	}
-	return aux_dato;
-}
-*/
-void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
-	void *aux_dato = NULL;
-	nodo_abb_t *aux_borrar = *nodo_borrar;
-	aux_dato = aux_borrar->dato;
-	if(aux_borrar->izq && aux_borrar->der){
-		nodo_abb_t *reemplazo = buscar_reemplazante((*nodo_borrar)->der);
-		char *clave_pisar = strdup(reemplazo->clave);
-		void *dato_reemplazo = abb_borrar(arbol,reemplazo->clave);
-		arbol->cantidad++;
-		free((*nodo_borrar)->clave);
-		(*nodo_borrar)->clave = clave_pisar;
-		(*nodo_borrar)->dato = dato_reemplazo;
-	}
-	else{
-		if(!aux_borrar->izq && !aux_borrar->der)
-			*nodo_borrar = NULL;
-		else if(!aux_borrar->izq)
-			*nodo_borrar = aux_borrar->der;
-		else if(!aux_borrar->der)
-			*nodo_borrar = aux_borrar->izq;
-		
-		free(aux_borrar->clave);
-		free(aux_borrar);
 	}
 	return aux_dato;
 }
@@ -270,10 +243,8 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
 bool abb_iter_in_avanzar_nodo(abb_iter_t *iter,nodo_abb_t *raiz){
     if(!raiz)
         return true;
-    if(!abb_apilar_izq(raiz,iter)){
+    if(!abb_apilar_izq(raiz,iter))
         return false;
-    }
-
 	return true;
 }
  

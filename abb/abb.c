@@ -240,7 +240,6 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 }
 
 
-//Iterador Externo
 bool abb_apilar_izq(nodo_abb_t *raiz,abb_iter_t *iter){
     if(!raiz)
         return true;
@@ -248,7 +247,7 @@ bool abb_apilar_izq(nodo_abb_t *raiz,abb_iter_t *iter){
         return false;
     return abb_apilar_izq(raiz->izq,iter);
 }
- 
+//Iterador Externo
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     abb_iter_t *abb_iter = malloc(sizeof(abb_iter_t));
     if(!abb_iter)   return NULL;
@@ -267,23 +266,15 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     return abb_iter;
 }
  
-bool abb_iter_in_avanzar_nodo(abb_iter_t *iter,nodo_abb_t *raiz){
-    if(!raiz)
-        return true;
-    if(!abb_apilar_izq(raiz,iter)){
-        return false;
-    }
-
-	return true;
-}
+// bool abb_iter_in_avanzar_nodo(abb_iter_t *iter,nodo_abb_t *raiz){
+// 	return abb_apilar_izq(raiz,iter);
+// }
  
 bool abb_iter_in_avanzar(abb_iter_t *iter){
     if(abb_iter_in_al_final(iter))
         return false;
     nodo_abb_t *aux = pila_desapilar(iter->pila);
-    if(!abb_iter_in_avanzar_nodo(iter,aux->der))
-        return false; 
-    return true;
+	return abb_apilar_izq(aux->der,iter);
 }
 
 bool abb_iter_in_al_final(const abb_iter_t *iter){
