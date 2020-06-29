@@ -8,6 +8,8 @@
 #include <unistd.h>  
 
 #define MAX 5000
+#define PRUEBA_CONTADOR 5
+#define PRUEBA_CONTADOR_ENTERO 12
 
 void pruebas_debug();
 
@@ -18,13 +20,31 @@ void imprimir_strings(void * str){
 void imprimir_enteros(void *dato){
     printf(" %d \n",*(int*)dato);
 }
-
+/*
 bool visitar(const char *clave, void *dato, void *extra){
     if( !(*(int*)dato % 2 == 0)){
         *(int*)dato *= *(int*)extra;
     }
     return true;
+}*/
+/*
+bool visitar(void * dato, void *extra){
+    if(*(int*) extra >= PRUEBA_CONTADOR)
+        return false;
+    *(int*) extra +=1;
+    printf("%d ",*(int*) dato);
+    return true;  
 }
+
+
+bool visitar2(void * dato, void * extra){
+    if(*(int*) extra >= PRUEBA_CONTADOR_ENTERO)
+        return false;
+    *(int*) extra+=1;
+    *(int*) dato += *(int*)extra;
+    return true;
+}*/
+
 
 int comparar_enteros(const char *a,const char *b){
     int aux_a = atoi(a);
@@ -458,10 +478,103 @@ void desordenar_arreglo(int *v,int largo){
     abb_destruir(abb);
 }
 
+bool visitar(const char *clave, void * dato, void *extra){
+    if(*(int*) extra >= PRUEBA_CONTADOR)
+        return false;
+    *(int*) extra +=1;
+    *(int*) dato += *(int*)extra;
+   // printf("con extra = %d , para clave = %s , el dato = %d, cuando debería dar = %d\n",*(int*)extra,clave,*(int*) dato,*(int*)dato);
+    return true;  
+}
+
+
+bool visitar2(const char *clave, void * dato, void * extra){
+    if(!strcmp(clave,"f")){
+        printf("ENCONTRÉ EL DATO A CORTAR Y ES = %s\n",clave);
+        return false;
+    }
+    
+    printf("Ultima clave visitada %s\n",clave);
+    
+    return true;
+} // corte en rama izquierda
+
+bool visitar3(const char *clave, void * dato, void * extra){
+    if(!strcmp(clave,"d")){
+        printf("ENCONTRÉ EL DATO A CORTAR Y ES = %s\n",clave);
+        return false;
+    }
+    
+    printf("Ultima clave visitada %s\n",clave);
+    return true;
+} // corte en rama izquierda con el derecho
+
+bool visitar4(const char *clave, void * dato, void * extra){
+    printf("Ultima clave visitada %s\n",clave);
+        return false;
+} // corte simple y devuelvo false
+
+bool visitar5(const char *clave, void * dato, void * extra){
+    if(!strcmp(clave,"j")){
+        printf("ENCONTRÉ EL DATO A CORTAR Y ES = %s\n",clave);
+        return false;
+    }
+    
+    printf("Ultima clave visitada %s\n",clave);
+    return true;
+} // corte en la raiz
+
+
+void prueba_abb_iterar_interno(){
+
+    abb_t* abb = abb_crear(strcmp,NULL);
+ 
+    char *clave1 = "j", *clave2 = "s", *clave3 = "f", *clave4 = "g";
+    char *clave5 = "b", *clave6 = "x", *clave7 = "w", *clave8 = "z"; 
+    char *clave9 = "k", *clave10 = "g", *clave11 = "d", *clave12 = "a";
+
+    int valor1 = 1, valor2 = 5, valor3 = 7, valor4 = 3;
+    int valor5 = 10, valor6 = 15, valor7 = 85, valor8 = 12;
+    int valor9 = 45, valor10 = 9, valor11 = 25, valor12 = 75;
+
+    print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, &valor1));
+    print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2, &valor2));
+    print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3, &valor3));
+    print_test("Prueba abb insertar clave4", abb_guardar(abb, clave4, &valor4));
+    print_test("Prueba abb insertar clave5", abb_guardar(abb, clave5, &valor5));
+    print_test("Prueba abb insertar clave6", abb_guardar(abb, clave6, &valor6));
+    print_test("Prueba abb insertar clave7", abb_guardar(abb, clave7, &valor7));
+    print_test("Prueba abb insertar clave8", abb_guardar(abb, clave8, &valor8));
+    print_test("Prueba abb insertar clave9", abb_guardar(abb, clave9, &valor9));
+    print_test("Prueba abb insertar clave10", abb_guardar(abb, clave10, &valor10));
+    print_test("Prueba abb insertar clave11", abb_guardar(abb, clave11, &valor11));
+    print_test("Prueba abb insertar clave12", abb_guardar(abb, clave12, &valor12));
+    print_test("Prueba abb la cantidad de elementos es 12", abb_cantidad(abb) == 11);
+    int contador = 0;
+    abb_in_order(abb,visitar,&contador);
+    print_test("El dato de la clave a cambió", *(int*)abb_obtener(abb,clave12) == 76);
+    print_test("El dato de la clave b cambió", *(int*)abb_obtener(abb,clave5) == 12);
+    print_test("El dato de la clave d cambió", *(int*)abb_obtener(abb,clave11) == 28);
+    print_test("El dato de la clave f cambió", *(int*)abb_obtener(abb,clave3) == 11);
+    print_test("El dato de la clave g cambió", *(int*)abb_obtener(abb,clave10) == 14);    
+    print_test("El dato de la clave j sigue igual", *(int*)abb_obtener(abb,clave1) == 1);
+    abb_in_order(abb,visitar2,&contador);
+    printf("Arriba de esto es visitar2 \n");
+    abb_in_order(abb,visitar3,&contador);
+    printf("Arriba de esto es visitar3 \n");
+    /*abb_in_order(abb,visitar4,&contador);
+    printf("Arriba de esto es visitar4 \n");
+    abb_in_order(abb,visitar5,&contador);
+    printf("Arriba de esto es visitar5 \n");
+*/    abb_destruir(abb);
+
+}
+
+
 void pruebas_abb_catedra()
 {
     /* Ejecuta todas las pruebas unitarias. */
-    prueba_crear_abb_vacio(); //OK && VALGRIND
+/*    prueba_crear_abb_vacio(); //OK && VALGRIND
     prueba_iterar_abb_vacio(); //OK && VALGRIND
     prueba_abb_insertar(); //OK && VALGRIND
     prueba_abb_reemplazar(); //OK && VALGRIND
@@ -472,6 +585,7 @@ void pruebas_abb_catedra()
     prueba_abb_volumen(MAX, true); //OK //ERROR EN VALGRIND
     prueba_abb_iterar(); //OK && VALGRIND
     prueba_abb_iterar_volumen(MAX); //OK  && VALGRIND
+   */ prueba_abb_iterar_interno();
 }
 
 

@@ -87,20 +87,19 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 		nodo_abb_t* nodo = abb_nodo_crear(clave,dato);
 		if(!nodo)	return false;
 		arbol->raiz = nodo;
-		arbol->cantidad++;
-		return true;
 	}
-	nodo_abb_t **nodo_buscado = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
-	if(*nodo_buscado != NULL){
-	 	if(arbol->destruir)
-			arbol->destruir((*nodo_buscado)->dato); 	
-	 	(*nodo_buscado)->dato = dato;
-		return true;
+	else{
+		nodo_abb_t **nodo_buscado = abb_nodo_buscar(&arbol->raiz,clave,arbol->comparar);
+		if(*nodo_buscado != NULL){
+	 		if(arbol->destruir)
+				arbol->destruir((*nodo_buscado)->dato); 	
+	 		(*nodo_buscado)->dato = dato;
+			return true;
+		}
+		nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
+		if(!nodo_insertar)	return false;
+		*nodo_buscado = nodo_insertar;
 	}
-	nodo_abb_t *nodo_insertar = abb_nodo_crear(clave,dato);
-	if(!nodo_insertar)	return false;
-	*nodo_buscado = nodo_insertar;
-	
 	arbol->cantidad++;
     return true;
 }
@@ -226,13 +225,17 @@ void abb_destruir(abb_t *arbol){
 
 // Iterador Interno
 
-void abb_in_order_wrapper(nodo_abb_t *raiz, bool visitar(const char *, void *, void*),void *extra){
-	if(raiz != NULL){
-		abb_in_order_wrapper(raiz->izq,visitar,extra);	
-		if(!visitar(raiz->clave,raiz->dato,extra))
-			return;
-		abb_in_order_wrapper(raiz->der,visitar,extra);
-	}
+bool abb_in_order_wrapper(nodo_abb_t *raiz, bool visitar(const char *, void *, void*),void *extra){
+	if(!raiz)
+		return true;
+	
+	if(!abb_in_order_wrapper(raiz->izq,visitar,extra))
+		return true;
+	//printf("Entré aca con %s \n", raiz->clave);
+	if(!visitar(raiz->clave,raiz->dato,extra))
+		return false;	
+	//printf("Entré aca con %s \n", raiz->clave);
+	return abb_in_order_wrapper(raiz->der,visitar,extra);
 }
 
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
