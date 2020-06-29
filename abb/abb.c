@@ -111,39 +111,7 @@ nodo_abb_t *buscar_reemplazante(nodo_abb_t *nodo){
 	}
 	return aux_min;
 }
-/*
-void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
-	void *aux_dato = NULL;
-	nodo_abb_t *aux_borrar = *nodo_borrar;
-	if(!aux_borrar->izq && !aux_borrar->der){
-		aux_dato = aux_borrar->dato;
-		free(aux_borrar->clave);
-		free(aux_borrar);
-		*nodo_borrar = NULL;
-	}
-	else if(!aux_borrar->izq){
-		aux_dato = aux_borrar->dato;
-		*nodo_borrar = aux_borrar->der;
-		free(aux_borrar->clave);
-		free(aux_borrar);
-	}else if(!aux_borrar->der){
-		aux_dato = aux_borrar->dato;
-		*nodo_borrar = aux_borrar->izq;
-		free(aux_borrar->clave);
-		free(aux_borrar);
-	}else{
-		aux_dato = aux_borrar->dato;
-		nodo_abb_t *reemplazo = buscar_reemplazante((*nodo_borrar)->der);
-		char *clave_pisar = strdup(reemplazo->clave);
-		void *dato_reemplazo = abb_borrar(arbol,reemplazo->clave);
-		arbol->cantidad++;
-		free((*nodo_borrar)->clave);
-		(*nodo_borrar)->clave = clave_pisar;
-		(*nodo_borrar)->dato = dato_reemplazo;
-	}
-	return aux_dato;
-}
-*/
+
 void *borrar_nodo(abb_t *arbol,nodo_abb_t **nodo_borrar,const char *clave){
 	void *aux_dato = NULL;
 	nodo_abb_t *aux_borrar = *nodo_borrar;
@@ -224,18 +192,18 @@ void abb_destruir(abb_t *arbol){
 }
 
 // Iterador Interno
-
 bool abb_in_order_wrapper(nodo_abb_t *raiz, bool visitar(const char *, void *, void*),void *extra){
 	if(!raiz)
 		return true;
 	
 	if(!abb_in_order_wrapper(raiz->izq,visitar,extra))
-		return true;
-	//printf("Entré aca con %s \n", raiz->clave);
+		return false;
 	if(!visitar(raiz->clave,raiz->dato,extra))
 		return false;	
-	//printf("Entré aca con %s \n", raiz->clave);
-	return abb_in_order_wrapper(raiz->der,visitar,extra);
+	if(!abb_in_order_wrapper(raiz->der,visitar,extra))
+		return false;
+	return true;
+
 }
 
 void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra){
@@ -268,10 +236,6 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol){
     } 
     return abb_iter;
 }
- 
-// bool abb_iter_in_avanzar_nodo(abb_iter_t *iter,nodo_abb_t *raiz){
-// 	return abb_apilar_izq(raiz,iter);
-// }
  
 bool abb_iter_in_avanzar(abb_iter_t *iter){
     if(abb_iter_in_al_final(iter))
