@@ -38,6 +38,10 @@ bool heap_redimensionar(heap_t *heap,size_t nuevo_tam){
 }
 
 
+void heapify(void *arr[],size_t n, cmp_func_t cmp){
+    for(int i = n; i >= 0; i--)
+        downheap(arr,n,i,cmp);
+}
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 //Heapify
@@ -112,16 +116,16 @@ void *heap_ver_max(const heap_t *heap){
 size_t comparar_hijos(void ** arr,size_t izq,size_t der, cmp_func_t cmp){
 	return cmp(arr[izq],arr[der]) <= 0 ? der : izq;
 }
-void downheap(void **arr,size_t padre, cmp_func_t cmp){
-    if(hijo == 0)    
+void downheap(void **arr,size_t tam,size_t padre, cmp_func_t cmp){
+    if(padre >= tam)    
     	return;
     size_t izquierdo = NULL;
     size_t derecho = calculo_pos_hijos(padre,&izquierdo); // tranquilamente podemos calcularlo para hijo izquierdo y despues sumarle uno, pero por ahí queda mas lindo así, va nose, como prefieras
     size_t hijo = comparar_hijos(arr,izquierdo,derecho,cmp); // con esto me salvo de hacer demasiados ifs, directamente me quedo con el mas grande entre el izq y el derecho
 
-    if(padre_menor_que_hijo(arr,padre,hijo,cmp)){
+    if(padre_menor_que_hijo(padre,hijo,cmp)){
         swap(arr,padre,hijo);
-        downheap(arr,padre,cmp);
+        downheap(arr,tam,padre,cmp);
     }
 
 }
