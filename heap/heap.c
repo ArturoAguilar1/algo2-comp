@@ -116,6 +116,7 @@ void *heap_ver_max(const heap_t *heap){
 size_t comparar_hijos(void ** arr,size_t izq,size_t der, cmp_func_t cmp){
 	return cmp(arr[izq],arr[der]) <= 0 ? der : izq;
 }
+
 void downheap(void **arr,size_t tam,size_t padre, cmp_func_t cmp){
     if(padre >= tam)    
     	return;
@@ -130,7 +131,6 @@ void downheap(void **arr,size_t tam,size_t padre, cmp_func_t cmp){
 
 }
 
-
 void *heap_desencolar(heap_t *heap){
     if(heap_esta_vacio(heap))
         return NULL;
@@ -141,7 +141,7 @@ void *heap_desencolar(heap_t *heap){
     }
     void * aux = heap->datos[0];
 
-    heap->datos[0] = heap->datos[heap->cant];
+    heap->datos[0] = heap->datos[heap->cant-1];
 	heap->cant--;
 
 	downheap(heap->datos,heap->cant,heap->cmp);
@@ -150,8 +150,18 @@ void *heap_desencolar(heap_t *heap){
 }
 
 
+void heap_sort_wrapper(void *arr[],size_t cant, cmp_func_t cmp){
+    if(cant == 1)
+        return;
+    swap(arr,0,cant-1);
+    cant--;
+    downheap(arr,0,cmp,cant);
+    heap_sort_wrapper(arr,cant,cmp);
+}
+
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
-	if(cant == 1)
-    	return;
-    //Hay que aplicar heapify
+    if(cant < 1)
+        return;
+    heapify(elementos);
+    heap_sort_wrapper(elementos,cant,cmp);
 }
