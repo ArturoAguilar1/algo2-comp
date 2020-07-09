@@ -49,8 +49,8 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)){
     //De esto no estoy seguro
-    for(size_t i = 0; i < heap->cant -1; i++){
-        if(destruir_elemento)
+    if(destruir_elemento != NULL){
+        for(size_t i = 0; i < heap->cant -1; i++){
             destruir_elemento(heap->datos[i]);
     }
     free(heap->datos);
