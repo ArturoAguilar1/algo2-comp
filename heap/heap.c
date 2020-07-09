@@ -44,6 +44,19 @@ void heapify(void *arr[],size_t n, cmp_func_t cmp){
 }
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
+    heap_t *heap = heap_crear(cmp);
+    if(!heap)   return NULL;
+
+    if(n > heap->tam){
+        if(!heap_redimensionar(heap,n))
+            return NULL;
+    }
+    
+    for(size_t i = 0; i < n; i++){
+        heap->datos[i] = arreglo[i];
+    }
+    heapify(heap->datos,n,cmp);
+    return heap;
 //Heapify
 }
 
