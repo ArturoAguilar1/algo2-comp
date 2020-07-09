@@ -112,8 +112,8 @@ void *heap_ver_max(const heap_t *heap){
 size_t comparar_hijos(void ** arr,size_t izq,size_t der, cmp_func_t cmp){
 	return cmp(arr[izq],arr[der]) <= 0 ? der : izq;
 }
-void downheap(void **arr,size_t padre, cmp_func_t cmp){
-    if(hijo == 0)    
+void downheap(void **arr,size_t padre, cmp_func_t cmp,size_t cant){
+    if(padre > cant/2) //estoy en las hojas    
     	return;
     size_t izquierdo = NULL;
     size_t derecho = calculo_pos_hijos(padre,&izquierdo); // tranquilamente podemos calcularlo para hijo izquierdo y despues sumarle uno, pero por ahí queda mas lindo así, va nose, como prefieras
@@ -140,14 +140,26 @@ void *heap_desencolar(heap_t *heap){
     heap->datos[0] = heap->datos[heap->cant];
 	heap->cant--;
 
-	downheap(heap->datos,heap->cant,heap->cmp);
+	downheap(heap->datos,0,heap->cmp,heap->cant);
 
 	return aux;    
 }
 
 
-void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+void heap_sort_wrapper(void *arr[],size_t cant, cmp_func_t cmp){
 	if(cant == 1)
     	return;
-    //Hay que aplicar heapify
+    swap(arr,0,cant-1);
+    cant--;
+    downheap(arr,0,cmp,cant);
+    heap_sort_wrapper(arr,cant,cmp);
+
+
+}
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+	if(cant < 1)
+		return;
+	heapify(elementos);
+	heap_sort_wrapper(elementos,cant,cmp);
+    //Hay que aplicar heapify   
 }
