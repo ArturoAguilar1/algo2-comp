@@ -1,6 +1,6 @@
 #include "heap.h"
 
-#define HEAP_TAM_INICIAL 1;
+#define HEAP_TAM_INICIAL 10
 
 struct heap{
     void **datos;
@@ -86,7 +86,7 @@ void upheap(void **arr,size_t hijo, cmp_func_t cmp){
     if(hijo == 0)    
     	return;
     size_t padre = calculo_pos_padre(hijo);
-    if(padre_menor_que_hijo(arr,padre,hijo,cmp)){
+    if(padre_menor_que_hijo(padre,hijo,cmp)){
         swap(arr,padre,hijo);
         upheap(arr,padre,cmp);
     }
