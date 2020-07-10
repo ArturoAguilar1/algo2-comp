@@ -95,8 +95,10 @@ bool heap_redimensionar(heap_t *heap,size_t nuevo_tam){
 
 
 void heapify(void *arr[],size_t n, cmp_func_t cmp){
-    for(int i = (int)n; i >= 0; i--)
-        downheap(arr,n,i,cmp);
+    for(int i = (int)n; i >= 0; i--){
+        printf(" : %d \n",*(int*)arr[i]);
+        downheap(arr,n,(size_t)i,cmp);        
+    }
 }
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
@@ -112,6 +114,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
         heap->datos[i] = arreglo[i];
         printf("Funca: %d \n",*(int*)heap->datos[i]);
     }
+    heap->cant = n;
     heapify(heap->datos,n,cmp);
     return heap;
 //Heapify
