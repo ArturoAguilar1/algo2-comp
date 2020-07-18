@@ -1,0 +1,1 @@
+zyxcba: zyxcba.o csv.o hash.o abb.o cola.o lista.o pila.o strutil.o

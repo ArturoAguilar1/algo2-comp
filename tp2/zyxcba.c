@@ -8,6 +8,11 @@
 #define COMANDO_ATENDER "ATENDER_SIGUIENTE"
 #define COMANDO_INFORME "INFORME"
 
+typedef enum{
+	URGENTE = 1;
+	REGULAR = 0;
+}urgencia_t;
+
 void procesar_comando(const char* comando, const char** parametros) {
 	if (strcmp(comando, COMANDO_PEDIR_TURNO) == 0) {
 
@@ -30,7 +35,7 @@ void eliminar_fin_linea(char* linea) {
 void procesar_entrada() {
 	char* linea = NULL;
 	size_t c = 0;
-	while (getline(&linea, &c, stdin) > 0) {
+	while (getline(&linea, &c, stdin) > 0){
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		if (campos[1] == NULL) {
@@ -46,8 +51,13 @@ void procesar_entrada() {
 	free(linea);
 }
 
+int main(int argc, char** argv){
+	//Cargar archivos en memoria, en listas
+	//lista_doctores, lista_pacientes
+	//llamar a procesar entrada
+	
 
 
-int main(int argc, char** argv) {
+	//liberar memoria, listas.
 	return 0;
 }
