@@ -9,8 +9,13 @@
 #include "paciente.h"
 #include "csv.h"
 
+//PEDIR_TURNO:NOMBRE_PACIENTE,NOMBRE_ESPECIALIDAD,URGENCIA
 #define COMANDO_PEDIR_TURNO "PEDIR_TURNO"
+
+//ATENDER_SIGUIENTE:NOMBRE_DOCTOR
 #define COMANDO_ATENDER "ATENDER_SIGUIENTE"
+
+//INFORME:[INICIO],[FIN]
 #define COMANDO_INFORME "INFORME"
 
 typedef enum{
@@ -20,13 +25,16 @@ typedef enum{
 
 void procesar_comando(const char* comando,char** parametros) {
 	if (strcmp(comando, COMANDO_PEDIR_TURNO) == 0) {
-
+		//procesar_pedir_turno(parametros);
+		fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
-
+		//procesar_atender(parametros);
+	fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_INFORME) == 0) {
-
+		//procesar_informe(parametros);
+	fprintf(stdout,"comando encontrado %s \n",comando);
 	} else {
-
+		fprintf(stdout,ENOENT_CMD,comando);
 	}
 }
 
@@ -90,11 +98,11 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
-	lista_iterar(lista_doctores,imp_doctores,NULL);
-	printf("\n\n");
-	lista_iterar(lista_pacientes,imp_pacientes,NULL);
+	// lista_iterar(lista_doctores,imp_doctores,NULL);
+	// printf("\n\n");
+	// lista_iterar(lista_pacientes,imp_pacientes,NULL);
 
-	//procesar entrada
+	procesar_entrada();
 
 
 
