@@ -54,8 +54,9 @@ bool lista_insertar_primero(lista_t *lista,void *dato){
 	nodo_t *nodo = nodo_crear(dato);
 	if(!nodo) return false;
 
-    if(lista_esta_vacia(lista))
+    if(lista_esta_vacia(lista)){
         lista->ult = nodo;
+    }
     
 	nodo->sig = lista->prim;
 	lista->prim = nodo;

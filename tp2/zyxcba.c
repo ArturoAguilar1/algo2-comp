@@ -1,3 +1,4 @@
+#define  _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -98,11 +99,11 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
-	// lista_iterar(lista_doctores,imp_doctores,NULL);
-	// printf("\n\n");
-	// lista_iterar(lista_pacientes,imp_pacientes,NULL);
+	lista_iterar(lista_doctores,imp_doctores,NULL);
+	printf("\n\n");
+	lista_iterar(lista_pacientes,imp_pacientes,NULL);
 
-	procesar_entrada();
+	//procesar_entrada();
 
 
 

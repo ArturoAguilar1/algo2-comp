@@ -7,11 +7,11 @@
 #include "paciente.h"
 
 struct paciente{
-    int año_inscripcion;
+    int ano_inscripcion;
     char *nombre;
 };
 
-paciente_t *paciente_crear(const char *nombre, int año){
+paciente_t *paciente_crear(const char *nombre, int ano){
     paciente_t *paciente = malloc(sizeof(paciente_t));
     if(!paciente)   return NULL;
 
@@ -21,7 +21,7 @@ paciente_t *paciente_crear(const char *nombre, int año){
         return NULL;
     }
 
-    paciente->año_inscripcion = año;
+    paciente->ano_inscripcion = ano;
 
     return paciente;
 }
@@ -36,6 +36,6 @@ void paciente_destruir(paciente_t *p){
 }
 
 void paciente_imprimir(paciente_t *pac){
-    printf("%s : %d \n", pac->nombre,pac->año_inscripcion);
+    printf("%s : %d \n", pac->nombre,pac->ano_inscripcion);
 }
 
