@@ -9,6 +9,8 @@
 #include "doctor.h"
 #include "paciente.h"
 #include "csv.h"
+#include "hash.h"
+#include "abb.h"
 
 //PEDIR_TURNO:NOMBRE_PACIENTE,NOMBRE_ESPECIALIDAD,URGENCIA
 #define COMANDO_PEDIR_TURNO "PEDIR_TURNO"
@@ -19,16 +21,17 @@
 //INFORME:[INICIO],[FIN]
 #define COMANDO_INFORME "INFORME"
 
-typedef enum{
-	URGENTE = 1,
-	REGULAR = 0
-}urgencia_t;
 
-void procesar_comando(const char* comando,char** parametros) {
+void procesar_comando(clinica_t *clinica,const char* comando,char** parametros) {
 	if (strcmp(comando, COMANDO_PEDIR_TURNO) == 0) {
+		st_pedir_turno = clinica_pedir_turno(clinica,parametros);
+			clinica_imprimir_pedir_turno(st_pedir_turno);
+			//fprintf(stdout,st);
 		//procesar_pedir_turno(parametros);
 		fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
+		st_cmd_atender = clinica_atender(clinica,parametros);
+		clinica_imprimir_atender(clinica,st_cmd_atender);
 		//procesar_atender(parametros);
 	fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_INFORME) == 0) {
@@ -91,24 +94,29 @@ int main(int argc, char** argv){
 		fprintf(stdout,"Error al invocar el programa\n");
 		return 1;
 	}
-	lista_t *lista_doctores = csv_crear_estructura(argv[1],doctor_parse,NULL);
-	if(!lista_doctores)	return 1;
-	lista_t *lista_pacientes = csv_crear_estructura(argv[2],paciente_parse,NULL);
-	if(!lista_pacientes){
-		lista_destruir(lista_doctores,wrraper_destruir_doc);
+	// clinica_t *clinica = malloc(size)
+	// lista_t *lista_doctores = csv_crear_estructura(argv[1],doctor_parse,NULL);
+	// if(!lista_doctores)	return 1;
+	// lista_t *lista_pacientes = csv_crear_estructura(argv[2],paciente_parse,NULL);
+	// if(!lista_pacientes){
+	// 	lista_destruir(lista_doctores,wrraper_destruir_doc);
+	// 	return 1;
+	// }
+	clinica_t *clinica = clinica_crear(argv[1],argv[2]);
+	if(!clinica)
 		return 1;
-	}
+	
+	// lista_iterar(lista_doctores,imp_doctores,NULL);
+	// printf("\n\n");
+	// lista_iterar(lista_pacientes,imp_pacientes,NULL);
 
-	lista_iterar(lista_doctores,imp_doctores,NULL);
-	printf("\n\n");
-	lista_iterar(lista_pacientes,imp_pacientes,NULL);
-
-	//procesar_entrada();
+	procesar_entrada();
 
 
 
 	lista_destruir(lista_pacientes,wrraper_destruir_pac);
 	lista_destruir(lista_doctores,wrraper_destruir_doc);
+	clinica_destruir(clinica);
 	//liberar memoria, listas.
 	return 0;
 }

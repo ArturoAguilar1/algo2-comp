@@ -9,7 +9,12 @@
 struct doctor{
     char * nombre;
     char * especialidad;
+    size_t *cant_pacientes_atendidos;
 };
+
+void doctor_atender(doctor_t *doc){
+    doc->cant_pacientes_atendidos++;
+}
 
 
 doctor_t *doctor_crear(const char *nombre, char* esp){
