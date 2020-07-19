@@ -3,12 +3,13 @@
 #include <string.h>
 #include <stdlib.h>
 //#include "funciones_tp2.h"
+#include "clinica.h"
 #include "strutil.h"
 #include "mensajes.h"
+#include "paciente.h"
 #include "lista.h"
 #include "csv.h"
-
-#include "clinica.h"
+#include "turnos.h"
 
 //PEDIR_TURNO:NOMBRE_PACIENTE,NOMBRE_ESPECIALIDAD,URGENCIA
 #define COMANDO_PEDIR_TURNO "PEDIR_TURNO"

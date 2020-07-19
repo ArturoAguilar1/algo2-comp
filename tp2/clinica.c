@@ -9,6 +9,7 @@
 #include "turnos.h"
 #include "doctor.h"
 #include "heap.h"
+#include "clinica.h"
 typedef enum{
     OK,
     ERROR_PACIENTE_NO_ENCONTRADO,
@@ -22,13 +23,13 @@ typedef enum{
     ERROR_NOMBRE_DOCTOR
 }st_atender_sig;
 
-typedef struct clinica{
+struct clinica{
 	lista_t *lista_doctores;
 	lista_t *lista_pacientes;
 	hash_t *hash_especialidades;
 	hash_t *hash_pacientes;
 	abb_t *abb_doctores;
-}clinica_t;
+};
 
 clinica_t *clinica_crear(char *archivo_doc, char *archivo_pac){
     clinica_t *clinica = malloc(sizeof(clinica_t));
@@ -138,12 +139,12 @@ hash_t *especialidades_a_hash(const lista_t *lista){
 
     return hash_esp;
 }
-
+/*
 clinica_imprimir_atender(st_atender){
     //OK :  Se atiende a NOMBRE_PACIENTE
     //N paciente(s) en espera para NOMBRE_ESPECIALIDAD
     
-}
+}*/
 
 void clinica_pedir_turno(clinica_t *clinica, char **params){
     st_pedir_turno st;
@@ -187,7 +188,7 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
     }
 }
 
-void clinica_atender_suiguiente(clinica_t *clinica, char **params){
+void clinica_atender_siguiente(clinica_t *clinica, char **params){
     st_atender_sig st;
     size_t cant_pacientes_espera;
     char *esp;
