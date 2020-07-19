@@ -16,6 +16,9 @@ void doctor_atender(doctor_t *doc){
     doc->cant_pacientes_atendidos++;
 }
 
+char *doctor_especialidad(doctor_t *doc){
+    return doc->especialidad;
+}
 
 doctor_t *doctor_crear(const char *nombre, char* esp){
     doctor_t *doctor = malloc(sizeof(doctor_t));

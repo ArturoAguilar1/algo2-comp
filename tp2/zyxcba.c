@@ -12,6 +12,7 @@
 #include "hash.h"
 #include "abb.h"
 
+#include "clinica.h"
 //PEDIR_TURNO:NOMBRE_PACIENTE,NOMBRE_ESPECIALIDAD,URGENCIA
 #define COMANDO_PEDIR_TURNO "PEDIR_TURNO"
 

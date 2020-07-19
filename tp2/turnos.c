@@ -18,15 +18,18 @@ struct turnos{
     size_t cant_pacientes_urgencia;
 };
 
-turno_t *turno_crear(bool minimo(size_t a,size_t b)){
-	turno_t *turno = malloc(sizeof(turno_t));
-	
+int prioridad_pacientes(const void *a, const void *b){
+	return 0;
+}
+
+turnos_t *turno_crear(cmp_func_t cmp){
+	turnos_t *turno = malloc(sizeof(turnos_t));
 	if(!turno)
 		return NULL;
 
 	turno->cant_pacientes_urgencia = 0;
 	turno->cola_urgencia = cola_crear();
-	turno->heap_regulares = heap_crear(minimo);
+	turno->heap_regulares = heap_crear(cmp);
 
 	return turno;
 
@@ -50,27 +53,21 @@ bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes
     return true;
 }
 
-bool turno_desencolar(turnos_t *turno,char *urgencia){
-	if(!strcmp(urgencia,"URGENTE")){
-		if(cant_pacientes_urgencia == 0)
-			fprintf(stdout,SIN_PACIENTES);
-		else{
-			cola_desencolar(turno->cola_urgencia);
-			turno->cant_pacientes_urgencia--;
-		}
-	}
-	else if(!strcmp(urgencia,"REGULAR")){
-		if(!heap_cantidad(turnos->heap_regulares))
-			fprintf(stdout,SIN_PACIENTES);
-		else
-			heap_desencolar(turno->heap_regulares);
-	}
-	else return false;
-
-	return true;
+bool turno_desencolar(turnos_t *turno){
+    void * aux;
+    if(turno->cant_pacientes_urgencia > 0){
+        cola_desencolar(turno->cola_urgencia);
+        turno->cant_pacientes_urgencia--;
+    }
+    else{
+        aux = heap_desencolar(turno->heap_regulares);
+        if(!aux)
+            return false;
+    }
+    return true;
 }
 
-void turno_destruir(turno_t *turno){
+void turnos_destruir(turnos_t *turno){
 	heap_destruir(turno->heap_regulares);
 	cola_destruir(turno->cola_urgencia);
 	free(turno);
