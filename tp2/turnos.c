@@ -1,9 +1,10 @@
-
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "paciente.h"
 #include "cola.h"
 #include "heap.h"
+#include "mensajes.h"
 #include "turnos.h"
 
 typedef enum{
@@ -17,7 +18,19 @@ struct turnos{
     size_t cant_pacientes_urgencia;
 };
 
+turno_t *turno_crear(bool minimo(size_t a,size_t b)){
+	turno_t *turno = malloc(sizeof(turno_t));
+	
+	if(!turno)
+		return NULL;
 
+	turno->cant_pacientes_urgencia = 0;
+	turno->cola_urgencia = cola_crear();
+	turno->heap_regulares = heap_crear(minimo);
+
+	return turno;
+
+}
 
 bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes,char *urgencia){
     if(!strcmp(urgencia,"URGENTE")){
@@ -36,3 +49,15 @@ bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes
     }
     return true;
 }
+
+void turno_desencolar(turnos_t *turno,char *urgencia){
+	if(!strcmp(urgencia,"URGENTE")){
+		if(cant_pacientes_urgencia == 0)
+			printf()
+		else{
+			cola_desencolar(turno->cola_urgencia);
+			turno->cant_pacientes_urgencia--;
+		}
+	}
+}
+
