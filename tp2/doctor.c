@@ -16,7 +16,7 @@ void doctor_atender(doctor_t *doc){
     doc->cant_pacientes_atendidos++;
 }
 
-const char *doctor_especialidad(doctor_t *doc){
+char *doctor_especialidad(doctor_t *doc){
     return doc->especialidad;
 }
 

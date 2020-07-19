@@ -16,7 +16,7 @@ static void eliminar_fin_linea(char* linea) {
 lista_t* csv_crear_estructura(const char* ruta_csv, void* (*creador) (char**, void*), void* extra) {
 	FILE* archivo = fopen(ruta_csv, "r");
 	if (!archivo) {
-		fprintf(stdout,ENOENT_ARCHIVO);
+		fprintf(stdout,ENOENT_ARCHIVO,ruta_csv);
 		return NULL;
 	}
 	
