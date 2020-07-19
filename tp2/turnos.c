@@ -50,14 +50,29 @@ bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes
     return true;
 }
 
-void turno_desencolar(turnos_t *turno,char *urgencia){
+bool turno_desencolar(turnos_t *turno,char *urgencia){
 	if(!strcmp(urgencia,"URGENTE")){
 		if(cant_pacientes_urgencia == 0)
-			printf()
+			fprintf(stdout,SIN_PACIENTES);
 		else{
 			cola_desencolar(turno->cola_urgencia);
 			turno->cant_pacientes_urgencia--;
 		}
 	}
+	else if(!strcmp(urgencia,"REGULAR")){
+		if(!heap_cantidad(turnos->heap_regulares))
+			fprintf(stdout,SIN_PACIENTES);
+		else
+			heap_desencolar(turno->heap_regulares);
+	}
+	else return false;
+
+	return true;
+}
+
+void turno_destruir(turno_t *turno){
+	heap_destruir(turno->heap_regulares);
+	cola_destruir(turno->cola_urgencia);
+	free(turno);
 }
 
