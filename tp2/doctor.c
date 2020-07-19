@@ -9,15 +9,19 @@
 struct doctor{
     char * nombre;
     char * especialidad;
-    size_t *cant_pacientes_atendidos;
+    size_t cant_pacientes_atendidos;
 };
 
 void doctor_atender(doctor_t *doc){
     doc->cant_pacientes_atendidos++;
 }
 
-char *doctor_especialidad(doctor_t *doc){
+const char *doctor_especialidad(doctor_t *doc){
     return doc->especialidad;
+}
+
+const char *doctor_nombre(doctor_t *doc){
+    return doc->nombre;
 }
 
 doctor_t *doctor_crear(const char *nombre, char* esp){

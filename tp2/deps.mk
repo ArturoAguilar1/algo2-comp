@@ -1,1 +1,1 @@
-zyxcba: zyxcba.o csv.o hash.o abb.o cola.o lista.o pila.o strutil.o
+zyxcba: zyxcba.o csv.o hash.o abb.o cola.o lista.o pila.o strutil.o heap.o turnos.o clinica.o paciente.o doctor.o

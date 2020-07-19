@@ -6,13 +6,10 @@
 #include "strutil.h"
 #include "mensajes.h"
 #include "lista.h"
-#include "doctor.h"
-#include "paciente.h"
 #include "csv.h"
-#include "hash.h"
-#include "abb.h"
 
 #include "clinica.h"
+
 //PEDIR_TURNO:NOMBRE_PACIENTE,NOMBRE_ESPECIALIDAD,URGENCIA
 #define COMANDO_PEDIR_TURNO "PEDIR_TURNO"
 
@@ -23,21 +20,23 @@
 #define COMANDO_INFORME "INFORME"
 
 
+
 void procesar_comando(clinica_t *clinica,const char* comando,char** parametros) {
 	if (strcmp(comando, COMANDO_PEDIR_TURNO) == 0) {
-		st_pedir_turno = clinica_pedir_turno(clinica,parametros);
-			clinica_imprimir_pedir_turno(st_pedir_turno);
+		clinica_pedir_turno(clinica,parametros);
+			// clinica_imprimir_pedir_turno(st_pedir_turno);
 			//fprintf(stdout,st);
 		//procesar_pedir_turno(parametros);
-		fprintf(stdout,"comando encontrado %s \n",comando);
+		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
-		st_cmd_atender = clinica_atender(clinica,parametros);
-		clinica_imprimir_atender(clinica,st_cmd_atender);
+		clinica_atender_siguiente(clinica,parametros);
+		//clinica_imprimir_atender(clinica,st_cmd_atender);
 		//procesar_atender(parametros);
-	fprintf(stdout,"comando encontrado %s \n",comando);
+		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_INFORME) == 0) {
+		clinica_informe_doctores(clinica,parametros);
 		//procesar_informe(parametros);
-	fprintf(stdout,"comando encontrado %s \n",comando);
+		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else {
 		fprintf(stdout,ENOENT_CMD,comando);
 	}
@@ -50,7 +49,7 @@ void eliminar_fin_linea(char* linea) {
 	}
 }
 
-void procesar_entrada() {
+void procesar_entrada(clinica_t *clinica) {
 	char* linea = NULL;
 	size_t c = 0;
 	while (getline(&linea, &c, stdin) > 0){
@@ -62,61 +61,24 @@ void procesar_entrada() {
 			continue;	
 		}
 		char** parametros = split(campos[1], ',');
-		procesar_comando(campos[0], parametros);
+		procesar_comando(clinica,campos[0], parametros);
 		free_strv(parametros);
 		free_strv(campos);
 	}
 	free(linea);
 }
 
-bool imp_doctores(void *dato, void*extra){
-	doctor_imprimir(dato);
-	return true;
-}
-
-bool imp_pacientes(void *dato, void *extra){
-	paciente_imprimir(dato);
-	return true;
-}
-
-void wrraper_destruir_doc(void *dato){
-	doctor_destruir(dato);
-}
-
-void wrraper_destruir_pac(void *dato){
-	paciente_destruir(dato);
-}
-
 int main(int argc, char** argv){
-	//Cargar archivos en memoria, en listas
-	//lista_doctores, lista_pacientes
-	//llamar a procesar entrada
 	if(argc != 3){
-		fprintf(stdout,"Error al invocar el programa\n");
+		fprintf(stdout,ENOENT_CANT_PARAMS);
 		return 1;
 	}
-	// clinica_t *clinica = malloc(size)
-	// lista_t *lista_doctores = csv_crear_estructura(argv[1],doctor_parse,NULL);
-	// if(!lista_doctores)	return 1;
-	// lista_t *lista_pacientes = csv_crear_estructura(argv[2],paciente_parse,NULL);
-	// if(!lista_pacientes){
-	// 	lista_destruir(lista_doctores,wrraper_destruir_doc);
-	// 	return 1;
-	// }
 	clinica_t *clinica = clinica_crear(argv[1],argv[2]);
 	if(!clinica)
 		return 1;
-	
-	// lista_iterar(lista_doctores,imp_doctores,NULL);
-	// printf("\n\n");
-	// lista_iterar(lista_pacientes,imp_pacientes,NULL);
 
-	procesar_entrada();
+	procesar_entrada(clinica);
 
-
-
-	lista_destruir(lista_pacientes,wrraper_destruir_pac);
-	lista_destruir(lista_doctores,wrraper_destruir_doc);
 	clinica_destruir(clinica);
 	//liberar memoria, listas.
 	return 0;

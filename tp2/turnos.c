@@ -35,6 +35,10 @@ turnos_t *turno_crear(cmp_func_t cmp){
 
 }
 
+bool turnos_vacios(turnos_t *turno){
+	return turno->cant_pacientes_urgencia == 0 && heap_esta_vacio(turno->heap_regulares);
+}
+
 bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes,char *urgencia){
     if(!strcmp(urgencia,"URGENTE")){
         //ENCOLAR urgencia
@@ -68,8 +72,8 @@ bool turno_desencolar(turnos_t *turno){
 }
 
 void turnos_destruir(turnos_t *turno){
-	heap_destruir(turno->heap_regulares);
-	cola_destruir(turno->cola_urgencia);
+	heap_destruir(turno->heap_regulares,NULL);
+	cola_destruir(turno->cola_urgencia,NULL);
 	free(turno);
 }
 
