@@ -195,10 +195,10 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
         return ERROR_PACIENTE_NO_ENCONTRADO;
     }
     turnos_t *turno = hash_obtener(clinica->hash_especialidades,params[1]);
-    // if(!turno){
-    //     //no pertene la especilidad en el hash especialides
-    //     return ERROR_NO_EXISTE_ESP;
-    // }
+    /*if(!turno){
+        // no pertene la especilidad en el hash especialides
+        return ERROR_NO_EXISTE_ESP;
+    }*/
     printf("Params[0]:%s, Params[1]: %s , Params[2]: %s \n", params[0],params[1],params[2]);
     if(!turno_encolar(turno,paciente,cant_pacientes_encolados,params[2])){
         return ERROR_URGENCIA;

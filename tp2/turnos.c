@@ -30,13 +30,22 @@ int prioridad_pacientes(const void *a, const void *b){
 
 turnos_t *turno_crear(){
 	turnos_t *turno = malloc(sizeof(turnos_t));
-	if(!turno)  return NULL;
+	if(!turno){
+        printf("No lo creé \n");
+        return NULL;
+    }
 
 	turno->cant_pacientes_urgencia = 0;
 	turno->cola_urgencia = cola_crear();
-	turno->heap_regulares = heap_crear(prioridad_pacientes);
-
-	return turno;
+	if(turno->cola_urgencia){
+        printf("Creé la urgencia \n");
+    }
+    turno->heap_regulares = heap_crear(prioridad_pacientes);
+    if(turno->heap_regulares){
+        printf("Creé el heap \n");
+    }
+    
+    return turno;
 
 }
 
@@ -46,19 +55,21 @@ bool turnos_vacios(turnos_t *turno){
 
 bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes,const char *urgencia){
     printf("::::::%s \n",urgencia);
-    if(strcmp(urgencia,dicc_urgencia[0]) == 0){
-        printf("no entro aca!\n");
         //ENCOLAR urgencia
-        if(!cola_encolar(turno->cola_urgencia,paciente))
-            return false;
-        turno->cant_pacientes_urgencia++;
-        *cant_pacientes = turno->cant_pacientes_urgencia;
-    }else if(strcmp(urgencia,dicc_urgencia[1]) == 0){
+    if(!cola_encolar(turno->cola_urgencia,paciente)){
+        return false;
+    turno->cant_pacientes_urgencia++;
+    *cant_pacientes = turno->cant_pacientes_urgencia;
+    }
+    else if(strcmp(urgencia,dicc_urgencia[1]) == 0){
+        printf("entré aca \n");
         //Encolar regular
-        if(!heap_encolar(turno->heap_regulares,paciente))
-            return false;
-        *cant_pacientes = heap_cantidad(turno->heap_regulares);
-    }else{
+    printf("tam regular %lu\n",heap_cantidad(turno->heap_regulares));
+    if(!heap_encolar(turno->heap_regulares,paciente))
+        return false;
+    printf("tam regular %lu\n",heap_cantidad(turno->heap_regulares));
+    *cant_pacientes = heap_cantidad(turno->heap_regulares);
+    } else{
         printf("aca?\n");
         return false;
     }
