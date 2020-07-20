@@ -70,14 +70,12 @@ bool turnos_vacios(turnos_t *turno){
 }
 
 bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes,const char *urgencia){
-    //printf("::::::%s \n",urgencia);
-        //ENCOLAR urgencia
     if(strcmp(urgencia,dicc_urgencia[0]) == 0){
-        if(!cola_encolar(turno->cola_urgencia,paciente)){
+        if(!cola_encolar(turno->cola_urgencia,paciente))
             return false;
         turno->cant_pacientes_urgencia++;
         *cant_pacientes = turno->cant_pacientes_urgencia;
-    }
+        
     }
     else if(strcmp(urgencia,dicc_urgencia[1]) == 0){
         if(!heap_encolar(turno->heap_regulares,paciente))
@@ -91,18 +89,18 @@ bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes
     return true;
 }
 
-bool turno_desencolar(turnos_t *turno){
-    void * aux;
+char *turno_desencolar(turnos_t *turno,size_t *cant_pacientes_esperar){
+    char *nombre_paciente;
     if(turno->cant_pacientes_urgencia > 0){
-        cola_desencolar(turno->cola_urgencia);
+        paciente_t *paciente = cola_desencolar(turno->cola_urgencia);
+        nombre_paciente = paciente_nombre(paciente);
         turno->cant_pacientes_urgencia--;
     }
     else{
-        aux = heap_desencolar(turno->heap_regulares);
-        if(!aux)
-            return false;
+        paciente_t *paciente = heap_desencolar(turno->heap_regulares);
+        nombre_paciente = paciente_nombre(paciente);
     }
-    return true;
+    return nombre_paciente;
 }
 
 void turnos_destruir(turnos_t *turno){

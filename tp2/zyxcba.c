@@ -30,7 +30,7 @@ void procesar_comando(clinica_t *clinica,const char* comando,char** parametros) 
 		//procesar_pedir_turno(parametros);
 		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
-		//clinica_atender_siguiente(clinica,parametros);
+		clinica_atender_siguiente(clinica,parametros);
 		//clinica_imprimir_atender(clinica,st_cmd_atender);
 		//procesar_atender(parametros);
 		//fprintf(stdout,"comando encontrado %s \n",comando);

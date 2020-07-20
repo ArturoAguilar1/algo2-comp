@@ -26,7 +26,7 @@ paciente_t *paciente_crear(const char *nombre, int ano){
     return paciente;
 }
 
-const char *paciente_nombre(paciente_t *pac){
+char *paciente_nombre(paciente_t *pac){
     return pac->nombre;
 }
 

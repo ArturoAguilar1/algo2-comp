@@ -8,7 +8,7 @@ void paciente_destruir(paciente_t *p);
 void *paciente_parse(char** params, void *extra);
 void paciente_imprimir(paciente_t *pac);
 
-const char *paciente_nombre(paciente_t *pac);
+char *paciente_nombre(paciente_t *pac);
 
 #endif
 

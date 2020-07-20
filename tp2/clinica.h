@@ -8,3 +8,4 @@ void clinica_pedir_turno(clinica_t *clinica,char **params);
 void clinica_destruir(clinica_t *clinica);
 void clinica_atender_siguiente(clinica_t *clinica, char **params);
 #endif 
+

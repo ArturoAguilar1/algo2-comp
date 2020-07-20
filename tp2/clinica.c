@@ -36,7 +36,7 @@ abb_t *doctores_a_abb(lista_t *lista);
 hash_t *pacientes_a_hash(lista_t *lista);
 hash_t *especialidades_a_hash(lista_t *lista);
 st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacientes_encolados);
-st_atender_sig atender_siguiente(clinica_t *clinica,char *nom_doctor,size_t *cant_pac_espera,char *especialidad, char *nom_paciente);
+st_atender_sig atender_siguiente(clinica_t *clinica,char *nom_doctor,size_t *cant_pac_espera,char *nom_paciente,char *especialidad);
 
 void wrapper_destruir_doctor(void *dato){
     doctor_destruir(dato);
@@ -212,7 +212,7 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
         // no pertene la especilidad en el hash especialides
         return ERROR_NO_EXISTE_ESP;
     }
-    printf("Params[0]:%s, Params[1]: %s , Params[2]: %s \n", params[0],params[1],params[2]);
+    //printf("Params[0]:%s, Params[1]: %s , Params[2]: %s \n", params[0],params[1],params[2]);
     if(!turno_encolar(turno,paciente,cant_pacientes_encolados,params[2])){
         return ERROR_URGENCIA;
     }
@@ -221,54 +221,54 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
     }
 }
 
-// void clinica_atender_siguiente(clinica_t *clinica, char **params){
-//     st_atender_sig st;
-//     size_t cant_pacientes_espera;
-//     char *esp;
-//     char *nom_paciente;
-//     //O tambien directamente, podria mandarle a atender siguiente los datos del paciente o doctor
+void clinica_atender_siguiente(clinica_t *clinica, char **params){
+    st_atender_sig st;
+    size_t cant_pacientes_espera;
+    //doctor_t *doc = abb_obtener(clinica->abb_doctores,params[0]);
+    char *esp =NULL;
+    char *nom_paciente = NULL;
+    //O tambien directamente, podria mandarle a atender siguiente los datos del paciente o doctor
 
-//     st = atender_siguiente(clinica,params[0],&cant_pacientes_espera,esp,nom_paciente);
-//     switch (st){
-//     case OK_ATENDER_SIG:
-//         fprintf(stdout,PACIENTE_ATENDIDO,nom_paciente);
-//         fprintf(stdout,CANT_PACIENTES_ENCOLADOS,cant_pacientes_espera,esp);
-//         break;
-//     case ERROR_NO_PACIENTES_ESPERA:
-//         fprintf(stdout,SIN_PACIENTES);
-//         break;
-//     case ERROR_NOMBRE_DOCTOR:
-//         fprintf(stdout,ENOENT_DOCTOR,params[0]);
-//         break;
-//     default:
-//         break;
-//     }
-// }
+    st = atender_siguiente(clinica,params[0],&cant_pacientes_espera,nom_paciente,esp);
+    switch (st){
+    case OK_ATENDER_SIG:
+        fprintf(stdout,PACIENTE_ATENDIDO,nom_paciente);
+        fprintf(stdout,CANT_PACIENTES_ENCOLADOS,cant_pacientes_espera,esp);
+        break;
+    case ERROR_NO_PACIENTES_ESPERA:
+        fprintf(stdout,SIN_PACIENTES);
+        break;
+    case ERROR_NOMBRE_DOCTOR:
+        fprintf(stdout,ENOENT_DOCTOR,params[0]);
+        break;
+    default:
+        break;
+    }
+}
 
-// st_atender_sig atender_siguiente(clinica_t *clinica,char *nom_doctor,size_t *cant_pac_espera,char *especialidad, char *nom_paciente){
-//     //Busco el doctor en abb -> O(log(d))
-//     doctor_t *doc = abb_obtener(clinica->abb_doctores,nom_doctor);
-//     if(!doc){
-//         //no existe el doctor
-//         return ERROR_NOMBRE_DOCTOR;
-//     }
-//     //busco su especialidad en hash_esp
-//     turnos_t *turno = hash_obtener(clinica->hash_especialidades,doctor_especialidad(doc));
-//     if(turnos_vacios(turno)){
-//         //DADA LA especialidad que me pasan, me fijo si hay pacientes que atender o no
-//         return ERROR_NO_PACIENTES_ESPERA;
-//     }
-//     //Ya el punteor que apunta a cola_urgencia y heap_regulares dada la especialidad del doctor ingresado
+st_atender_sig atender_siguiente(clinica_t *clinica,char *nom_doctor,size_t *cant_pac_espera,char *nom_paciente,char *especialidad){
+    //Busco el doctor en abb -> O(log(d))
+    doctor_t *doc = abb_obtener(clinica->abb_doctores,nom_doctor);
+    if(!doc){
+        //no existe el doctor
+        return ERROR_NOMBRE_DOCTOR;
+    }
+    //busco su especialidad en hash_esp
+    turnos_t *turno = hash_obtener(clinica->hash_especialidades,doctor_especialidad(doc));
+    if(turnos_vacios(turno)){
+        //DADA LA especialidad que me pasan, me fijo si hay pacientes que atender o no
+        return ERROR_NO_PACIENTES_ESPERA;
+    }
+    //Ya el punteor que apunta a cola_urgencia y heap_regulares dada la especialidad del doctor ingresado
+    doctor_atender(doc);
+    especialidad = doctor_especialidad(doc);
+    //que turnos, que puede acceder a la estructura de turnos, me diga cuantos pacientes hay para la especialdiad y
+    // tambien que paciende desencoló 
+    nom_paciente = turno_desencolar(turno,cant_pac_espera);
 
-//     doctor_atender(doc);
-//     especialidad = doctor_especialidad(doc);
-//     //que turnos, que puede acceder a la estructura de turnos, me diga cuantos pacientes hay para la especialdiad y
-//     // tambien que paciende desencoló 
-//     //turnos_desencolar(cant_pac_espera,nom_paciente);
 
-
-//     return OK_ATENDER_SIG;
-// }
+    return OK_ATENDER_SIG;
+}
 
 // void encolar_turno(hash_t *especialidades,char *esp,size_t *cant_pacientes_encolados){
 //     turnos_t *turnos = hash_obtener(especialides,esp);
