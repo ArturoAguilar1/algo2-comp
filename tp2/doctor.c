@@ -20,6 +20,10 @@ char *doctor_especialidad(doctor_t *doc){
     return doc->especialidad;
 }
 
+size_t doctor_cantidad_pacientes_atendidos(doctor_t *doc){
+    return doc->cant_pacientes_atendidos;
+}
+
 const char *doctor_nombre(doctor_t *doc){
     return doc->nombre;
 }
@@ -40,6 +44,8 @@ doctor_t *doctor_crear(const char *nombre, char* esp){
         free(doctor->nombre);
         return NULL;
     }
+
+    doctor->cant_pacientes_atendidos = 0;
 
     return doctor;
 }

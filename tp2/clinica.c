@@ -208,6 +208,7 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
     if(!turno){
         return ERROR_NO_EXISTE_ESP;
     }
+    //hash_imprimir(clinica->hash_especialidades);
     if(!turno_encolar(turno,paciente,cant_pacientes_encolados,params[2])){
         return ERROR_URGENCIA;
     }
@@ -239,7 +240,15 @@ void clinica_atender_siguiente(clinica_t *clinica,char **params){
 }
 
 void clinica_informe_doctores(clinica_t *clinica, char **params){
-
+    abb_iter_t *abb_iter = abb_iter_in_crear(clinica->abb_doctores,params[0],params[1]);
+    while(!abb_iter_in_al_final(abb_iter)){
+        doctor_t *doc = abb_obtener(clinica->abb_doctores,abb_iter_in_ver_actual(abb_iter));
+        printf("Doc: %s , Esp: %s Cant de paciente atendidos: %zu \n",
+                doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
+        
+        abb_iter_in_avanzar(abb_iter);
+    }
+    abb_iter_in_destruir(abb_iter);
 }
 
 void clinica_destruir(clinica_t *clinica){

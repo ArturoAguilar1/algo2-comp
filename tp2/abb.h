@@ -29,7 +29,7 @@ void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void
 //Primitivas del iterador externo
 typedef struct abb_iter abb_iter_t;
 
-abb_iter_t *abb_iter_in_crear(const abb_t *arbol);
+abb_iter_t *abb_iter_in_crear(const abb_t *arbol,char *inicio, char *fin);
 bool abb_iter_in_avanzar(abb_iter_t *iter);
 const char *abb_iter_in_ver_actual(const abb_iter_t *iter);
 bool abb_iter_in_al_final(const abb_iter_t *iter);

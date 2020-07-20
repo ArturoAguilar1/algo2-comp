@@ -10,6 +10,7 @@ void doctor_imprimir(doctor_t *doc);
 char *doctor_especialidad(doctor_t *doc);
 const char *doctor_nombre(doctor_t *doc);
 void doctor_atender(doctor_t *doc);
+size_t doctor_cantidad_pacientes_atendidos(doctor_t *doc);
 
 #endif
 
