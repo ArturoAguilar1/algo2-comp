@@ -70,21 +70,20 @@ bool turnos_vacios(turnos_t *turno){
 }
 
 bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes,const char *urgencia){
-    printf("::::::%s \n",urgencia);
+    //printf("::::::%s \n",urgencia);
         //ENCOLAR urgencia
-    if(!cola_encolar(turno->cola_urgencia,paciente)){
-        return false;
-    turno->cant_pacientes_urgencia++;
-    *cant_pacientes = turno->cant_pacientes_urgencia;
+    if(strcmp(urgencia,dicc_urgencia[0]) == 0){
+        if(!cola_encolar(turno->cola_urgencia,paciente)){
+            return false;
+        turno->cant_pacientes_urgencia++;
+        *cant_pacientes = turno->cant_pacientes_urgencia;
+    }
     }
     else if(strcmp(urgencia,dicc_urgencia[1]) == 0){
-        printf("entré aca \n");
-        //Encolar regular
-    printf("tam regular %lu\n",heap_cantidad(turno->heap_regulares));
-    if(!heap_encolar(turno->heap_regulares,paciente))
-        return false;
-    printf("tam regular %lu\n",heap_cantidad(turno->heap_regulares));
-    *cant_pacientes = heap_cantidad(turno->heap_regulares);
+        if(!heap_encolar(turno->heap_regulares,paciente))
+            return false;
+    //printf("tam regular %lu\n",heap_cantidad(turno->heap_regulares));
+        *cant_pacientes = heap_cantidad(turno->heap_regulares);
     } else{
         printf("aca?\n");
         return false;
