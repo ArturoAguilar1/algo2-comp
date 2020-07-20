@@ -25,19 +25,10 @@
 void procesar_comando(clinica_t *clinica,const char* comando,char** parametros) {
 	if (strcmp(comando, COMANDO_PEDIR_TURNO) == 0) {
 		clinica_pedir_turno(clinica,parametros);
-			// clinica_imprimir_pedir_turno(st_pedir_turno);
-			//fprintf(stdout,st);
-		//procesar_pedir_turno(parametros);
-		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
 		clinica_atender_siguiente(clinica,parametros);
-		//clinica_imprimir_atender(clinica,st_cmd_atender);
-		//procesar_atender(parametros);
-		//fprintf(stdout,"comando encontrado %s \n",comando);
 	} else if (strcmp(comando, COMANDO_INFORME) == 0) {
-		//clinica_informe_doctores(clinica,parametros);
-		//procesar_informe(parametros);
-		//fprintf(stdout,"comando encontrado %s \n",comando);
+		clinica_informe_doctores(clinica,parametros);
 	} else {
 		fprintf(stdout,ENOENT_CMD,comando);
 	}

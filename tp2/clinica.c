@@ -181,7 +181,6 @@ void clinica_pedir_turno(clinica_t *clinica,char **params){
     st_pedir_turno st;
     size_t cant_pacientes_encolados;
     st = pedir_turno(clinica,params,&cant_pacientes_encolados);
-   // hash_imprimir(clinica->hash_especialidades);
     switch (st){
     case OK_PEDIR_TURNO:
         fprintf(stdout,PACIENTE_ENCOLADO,params[0]);
@@ -203,16 +202,12 @@ void clinica_pedir_turno(clinica_t *clinica,char **params){
 st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacientes_encolados){
     paciente_t *paciente = hash_obtener(clinica->hash_pacientes,params[0]);
     if(!paciente){
-        //no pertenece
         return ERROR_PACIENTE_NO_ENCONTRADO;
     }
-    //printf("paciente: %s \n",paciente_nombre(paciente));
     turnos_t *turno = hash_obtener(clinica->hash_especialidades,params[1]);
     if(!turno){
-        // no pertene la especilidad en el hash especialides
         return ERROR_NO_EXISTE_ESP;
     }
-    //printf("Params[0]:%s, Params[1]: %s , Params[2]: %s \n", params[0],params[1],params[2]);
     if(!turno_encolar(turno,paciente,cant_pacientes_encolados,params[2])){
         return ERROR_URGENCIA;
     }
@@ -221,65 +216,31 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
     }
 }
 
-void clinica_atender_siguiente(clinica_t *clinica, char **params){
-    st_atender_sig st;
+
+void clinica_atender_siguiente(clinica_t *clinica,char **params){
     size_t cant_pacientes_espera;
-    //doctor_t *doc = abb_obtener(clinica->abb_doctores,params[0]);
-    char *esp =NULL;
-    char *nom_paciente = NULL;
-    //O tambien directamente, podria mandarle a atender siguiente los datos del paciente o doctor
-
-    st = atender_siguiente(clinica,params[0],&cant_pacientes_espera,nom_paciente,esp);
-    switch (st){
-    case OK_ATENDER_SIG:
-        fprintf(stdout,PACIENTE_ATENDIDO,nom_paciente);
-        fprintf(stdout,CANT_PACIENTES_ENCOLADOS,cant_pacientes_espera,esp);
-        break;
-    case ERROR_NO_PACIENTES_ESPERA:
-        fprintf(stdout,SIN_PACIENTES);
-        break;
-    case ERROR_NOMBRE_DOCTOR:
-        fprintf(stdout,ENOENT_DOCTOR,params[0]);
-        break;
-    default:
-        break;
-    }
-}
-
-st_atender_sig atender_siguiente(clinica_t *clinica,char *nom_doctor,size_t *cant_pac_espera,char *nom_paciente,char *especialidad){
-    //Busco el doctor en abb -> O(log(d))
-    doctor_t *doc = abb_obtener(clinica->abb_doctores,nom_doctor);
+    doctor_t *doc = abb_obtener(clinica->abb_doctores,params[0]);
     if(!doc){
-        //no existe el doctor
-        return ERROR_NOMBRE_DOCTOR;
+        fprintf(stdout,ENOENT_DOCTOR,params[0]);
+        return;
     }
-    //busco su especialidad en hash_esp
     turnos_t *turno = hash_obtener(clinica->hash_especialidades,doctor_especialidad(doc));
     if(turnos_vacios(turno)){
-        //DADA LA especialidad que me pasan, me fijo si hay pacientes que atender o no
-        return ERROR_NO_PACIENTES_ESPERA;
+        fprintf(stdout,SIN_PACIENTES);
+        return;
     }
-    //Ya el punteor que apunta a cola_urgencia y heap_regulares dada la especialidad del doctor ingresado
     doctor_atender(doc);
-    especialidad = doctor_especialidad(doc);
-    //que turnos, que puede acceder a la estructura de turnos, me diga cuantos pacientes hay para la especialdiad y
-    // tambien que paciende desencoló 
-    nom_paciente = turno_desencolar(turno,cant_pac_espera);
+    char *nom_paciente = turno_desencolar(turno,&cant_pacientes_espera);
+    fprintf(stdout,PACIENTE_ATENDIDO,nom_paciente);
+    fprintf(stdout,CANT_PACIENTES_ENCOLADOS,cant_pacientes_espera,doctor_especialidad(doc));
 
+    return;
 
-    return OK_ATENDER_SIG;
 }
 
-// void encolar_turno(hash_t *especialidades,char *esp,size_t *cant_pacientes_encolados){
-//     turnos_t *turnos = hash_obtener(especialides,esp);
-//     if(!turnos){
-//         hash_guardar(especialidades,turnos_crear())
-//     }
-//     if(!strcmp(params[2],"URGENTE")){
-//         cola_encolar(turnos->cola,)
-//     }
-// }
+void clinica_informe_doctores(clinica_t *clinica, char **params){
 
+}
 
 void clinica_destruir(clinica_t *clinica){
     lista_destruir(clinica->lista_doctores,wrapper_destruir_doctor);
@@ -290,23 +251,4 @@ void clinica_destruir(clinica_t *clinica){
     free(clinica);
 }
 
-
-
-// bool imp_doctores(void *dato, void*extra){
-// 	doctor_imprimir(dato);
-// 	return true;
-// }
-
-// bool imp_pacientes(void *dato, void *extra){
-// 	paciente_imprimir(dato);
-// 	return true;
-// }
-
-// void wrraper_destruir_doc(void *dato){
-// 	doctor_destruir(dato);
-// }
-
-// void wrraper_destruir_pac(void *dato){
-// 	paciente_destruir(dato);
-// }
 
