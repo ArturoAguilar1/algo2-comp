@@ -88,7 +88,7 @@ void cola_destruir(cola_t *cola, void (*destruir_dato)(void*)){
 }
 
 
-void imprimir_cola(cola_t *cola){
+void cola_imprimir(cola_t *cola){
     nodo_t *aux = cola->prim;
     while(aux){
         printf(" | %d | ->", *(int*)(aux->dato));

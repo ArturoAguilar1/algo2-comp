@@ -149,11 +149,23 @@ hash_t *especialidades_a_hash(lista_t *lista){
     }
     while(!lista_iter_al_final(iter)){
         turnos_t *turnos = turno_crear();
-        if(!turnos) return NULL;
+        if(!turnos) {
+            free(hash_esp);
+            lista_iter_destruir(iter);
+            return NULL;
+        }
+        //printf("Funciona cant: %zu \n",turno_cant_pacientes_urgencia(turnos));
+        turno_aumentar(turnos);
         doctor_t *doc = lista_iter_ver_actual(iter);
         hash_guardar(hash_esp,doctor_especialidad(doc),turnos);
+        //printf("Aumento?: %zu \n",turno_cant_pacientes_urgencia(turnos));
         lista_iter_avanzar(iter);
     }
+    printf("\n\n");
+    turnos_t *t = hash_obtener(hash_esp,"Fisiatria");
+    printf("Funciona cant: %zu \n",turno_cant_pacientes_urgencia(t));
+    turnos_t *bb = hash_obtener(hash_esp,"Neurologia");
+    printf("Funciona cant: %zu \n",turno_cant_pacientes_urgencia(bb));
     lista_iter_destruir(iter);
 
     return hash_esp;
@@ -165,7 +177,7 @@ clinica_imprimir_atender(st_atender){
     
 }*/
 
-void clinica_pedir_turno(clinica_t *clinica, char **params){
+void clinica_pedir_turno(clinica_t *clinica,char **params){
     st_pedir_turno st;
     size_t cant_pacientes_encolados;
     st = pedir_turno(clinica,params,&cant_pacientes_encolados);
@@ -194,11 +206,14 @@ st_pedir_turno pedir_turno(clinica_t *clinica,char **params,size_t *cant_pacient
         //no pertenece
         return ERROR_PACIENTE_NO_ENCONTRADO;
     }
+    printf("paciente: %s \n",paciente_nombre(paciente));
     turnos_t *turno = hash_obtener(clinica->hash_especialidades,params[1]);
-    /*if(!turno){
+    turno_imprimir_cola_urgencia(turno);
+    turno_imprimir_heap_regulares(turno);
+    if(!turno){
         // no pertene la especilidad en el hash especialides
         return ERROR_NO_EXISTE_ESP;
-    }*/
+    }
     printf("Params[0]:%s, Params[1]: %s , Params[2]: %s \n", params[0],params[1],params[2]);
     if(!turno_encolar(turno,paciente,cant_pacientes_encolados,params[2])){
         return ERROR_URGENCIA;

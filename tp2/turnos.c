@@ -24,29 +24,45 @@ struct turnos{
     size_t cant_pacientes_urgencia;
 };
 
+void turno_aumentar(turnos_t *turno){
+    turno->cant_pacientes_urgencia++;
+}
+
 int prioridad_pacientes(const void *a, const void *b){
 	return 0;
 }
 
 turnos_t *turno_crear(){
 	turnos_t *turno = malloc(sizeof(turnos_t));
-	if(!turno){
-        printf("No lo creé \n");
+	if(!turno)  return NULL;
+
+	turno->cola_urgencia = cola_crear();
+    if(!turno->cola_urgencia){
+        free(turno);
         return NULL;
     }
-
-	turno->cant_pacientes_urgencia = 0;
-	turno->cola_urgencia = cola_crear();
-	if(turno->cola_urgencia){
-        printf("Creé la urgencia \n");
-    }
     turno->heap_regulares = heap_crear(prioridad_pacientes);
-    if(turno->heap_regulares){
-        printf("Creé el heap \n");
+    if(!turno->heap_regulares){
+        free(turno);
+        cola_destruir(turno->cola_urgencia,NULL);
+        return NULL;
     }
+    turno->cant_pacientes_urgencia = 0;
     
     return turno;
 
+}
+
+void turno_imprimir_cola_urgencia(turnos_t *turno){
+    cola_imprimir(turno->cola_urgencia);
+}
+
+void turno_imprimir_heap_regulares(turnos_t *turno){
+    heap_imprimir(turno->heap_regulares);
+}
+
+size_t turno_cant_pacientes_urgencia(turnos_t *turno){
+    return turno->cant_pacientes_urgencia;
 }
 
 bool turnos_vacios(turnos_t *turno){
