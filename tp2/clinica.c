@@ -240,13 +240,23 @@ void clinica_atender_siguiente(clinica_t *clinica,char **params){
 }
 
 void clinica_informe_doctores(clinica_t *clinica, char **params){
+    doctor_t *doc1 = abb_obtener(clinica->abb_doctores,params[0]);
+    if(!doc1 && strcmp(params[0],"") != 0){
+        fprintf(stdout,ENOENT_DOCTOR,params[0]);
+        return;
+    }
+    doc1 = abb_obtener(clinica->abb_doctores,params[1]);
+    if(!doc1 && strcmp(params[1],"") != 0){
+        fprintf(stdout,ENOENT_DOCTOR,params[1]);
+        return;
+    }
     abb_iter_t *abb_iter = abb_iter_in_crear(clinica->abb_doctores,params[0],params[1]);
+    size_t i = 1;
     while(!abb_iter_in_al_final(abb_iter)){
         doctor_t *doc = abb_obtener(clinica->abb_doctores,abb_iter_in_ver_actual(abb_iter));
-        printf("Doc: %s , Esp: %s Cant de paciente atendidos: %zu \n",
-                doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
-        
-        abb_iter_in_avanzar(abb_iter);
+        fprintf(stdout,INFORME_DOCTOR,i++,doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
+        if(!abb_iter_in_avanzar(abb_iter))
+            break;
     }
     abb_iter_in_destruir(abb_iter);
 }

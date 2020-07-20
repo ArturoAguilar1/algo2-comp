@@ -249,6 +249,9 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
     if(abb_iter_in_al_final(iter))
         return false;
     nodo_abb_t *aux = pila_desapilar(iter->pila);
+	if(strcmp(iter->fin,aux->clave) == 0){
+		return false;
+	}
 	return abb_apilar_izq(aux->der,iter);
 }
 
