@@ -237,9 +237,20 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol,char *inicio, char *fin){
         pila_destruir(abb_iter->pila);
         free(abb_iter);
         return NULL;
-    } 
+    }
+	
 	while(strcmp(abb_iter_in_ver_actual(abb_iter),abb_iter->inicio) < 0){
 		abb_iter_in_avanzar(abb_iter);
+		if(abb_iter_in_al_final(abb_iter)){
+			pila_destruir(abb_iter->pila);
+        	free(abb_iter);
+        	return NULL;
+		} 
+	}
+	if(strcmp(abb_iter_in_ver_actual(abb_iter),abb_iter->fin) > 0 && strcmp(abb_iter->fin,"") != 0){
+		pila_destruir(abb_iter->pila);
+        free(abb_iter);
+        return NULL;
 	}
     return abb_iter;
 }

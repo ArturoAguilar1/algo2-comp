@@ -10,6 +10,8 @@ typedef void (*abb_destruir_dato_t) (void *);
 
 void imprimir_arbol(abb_t *arbol,void print(void*));
 
+void abb_iterar_rango(abb_t* arbol, char* inicio, char* fin, bool visitar(const char*, void*, void*), void* extra);
+
 abb_t* abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato);
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato);
