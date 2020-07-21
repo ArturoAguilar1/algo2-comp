@@ -28,6 +28,10 @@ void procesar_comando(clinica_t *clinica,const char* comando,char** parametros) 
 	} else if (strcmp(comando, COMANDO_ATENDER) == 0) {
 		clinica_atender_siguiente(clinica,parametros);
 	} else if (strcmp(comando, COMANDO_INFORME) == 0) {
+		if(parametros[0] == NULL || parametros[1] == NULL){
+        	fprintf(stdout,ENOENT_PARAMS,COMANDO_INFORME);
+			return;
+    	}
 		clinica_informe_doctores(clinica,parametros);
 	} else {
 		fprintf(stdout,ENOENT_CMD,comando);

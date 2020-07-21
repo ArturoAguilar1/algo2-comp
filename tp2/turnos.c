@@ -28,11 +28,7 @@ void turno_aumentar(turnos_t *turno){
     turno->cant_pacientes_urgencia++;
 }
 
-int prioridad_pacientes(const void *a, const void *b){
-	return 0;
-}
-
-turnos_t *turno_crear(){
+turnos_t *turno_crear(cmp_func_t cmp){
 	turnos_t *turno = malloc(sizeof(turnos_t));
 	if(!turno)  return NULL;
 
@@ -41,7 +37,7 @@ turnos_t *turno_crear(){
         free(turno);
         return NULL;
     }
-    turno->heap_regulares = heap_crear(prioridad_pacientes);
+    turno->heap_regulares = heap_crear(cmp);
     if(!turno->heap_regulares){
         free(turno);
         cola_destruir(turno->cola_urgencia,NULL);
@@ -62,13 +58,13 @@ bool turno_encolar(turnos_t *turno, paciente_t *paciente, size_t *cant_pacientes
         if(!cola_encolar(turno->cola_urgencia,paciente))
             return false;
         turno->cant_pacientes_urgencia++;
-        *cant_pacientes = turno->cant_pacientes_urgencia;
+        *cant_pacientes = turno->cant_pacientes_urgencia + heap_cantidad(turno->heap_regulares);
         
     }
     else if(strcmp(urgencia,dicc_urgencia[1]) == 0){
         if(!heap_encolar(turno->heap_regulares,paciente))
             return false;
-        *cant_pacientes = heap_cantidad(turno->heap_regulares);
+        *cant_pacientes = turno->cant_pacientes_urgencia + heap_cantidad(turno->heap_regulares);
     } else{
         return false;
     }
@@ -81,12 +77,12 @@ char *turno_desencolar(turnos_t *turno,size_t *cant_pacientes_esperar){
         paciente_t *paciente = cola_desencolar(turno->cola_urgencia);
         nombre_paciente = paciente_nombre(paciente);
         turno->cant_pacientes_urgencia--;
-        *cant_pacientes_esperar = turno->cant_pacientes_urgencia;
+        *cant_pacientes_esperar = turno->cant_pacientes_urgencia + heap_cantidad(turno->heap_regulares);
     }
     else{
         paciente_t *paciente = heap_desencolar(turno->heap_regulares);
         nombre_paciente = paciente_nombre(paciente);
-        *cant_pacientes_esperar = heap_cantidad(turno->heap_regulares);
+        *cant_pacientes_esperar = turno->cant_pacientes_urgencia + heap_cantidad(turno->heap_regulares);
     }
     return nombre_paciente;
 }

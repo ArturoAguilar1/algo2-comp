@@ -241,7 +241,6 @@ abb_iter_t *abb_iter_in_crear(const abb_t *arbol,char *inicio, char *fin){
 	while(strcmp(abb_iter_in_ver_actual(abb_iter),abb_iter->inicio) < 0){
 		abb_iter_in_avanzar(abb_iter);
 	}
-
     return abb_iter;
 }
  
@@ -249,7 +248,7 @@ bool abb_iter_in_avanzar(abb_iter_t *iter){
     if(abb_iter_in_al_final(iter))
         return false;
     nodo_abb_t *aux = pila_desapilar(iter->pila);
-	if(strcmp(iter->fin,aux->clave) == 0){
+	if(strcmp(iter->fin,aux->clave) <= 0){
 		return false;
 	}
 	return abb_apilar_izq(aux->der,iter);

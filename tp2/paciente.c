@@ -11,6 +11,10 @@ struct paciente{
     char *nombre;
 };
 
+int paciente_ano_inscripcion(paciente_t *paciente){
+    return paciente->ano_inscripcion;
+}
+
 paciente_t *paciente_crear(const char *nombre, int ano){
     paciente_t *paciente = malloc(sizeof(paciente_t));
     if(!paciente)   return NULL;

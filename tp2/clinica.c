@@ -139,6 +139,18 @@ hash_t *pacientes_a_hash(lista_t *lista){
     return hash_pacientes;
 }
 
+int prioridad_pacientes_regulares(const void *a, const void *b){
+    int aux1 = paciente_ano_inscripcion((paciente_t*)a);
+    int aux2 = paciente_ano_inscripcion((paciente_t*)b);
+    if(aux1 > aux2)
+        return -1;
+    else if(aux1 < aux2)
+        return 1;
+    else
+        return 0;
+    
+}
+
 hash_t *especialidades_a_hash(lista_t *lista){
     hash_t *hash_esp = hash_crear(wrapper_destruir_turno);
     if(!hash_esp)   return NULL;
@@ -148,7 +160,7 @@ hash_t *especialidades_a_hash(lista_t *lista){
         return NULL;
     }
     while(!lista_iter_al_final(iter)){
-        turnos_t *turnos = turno_crear();
+        turnos_t *turnos = turno_crear(prioridad_pacientes_regulares);
         if(!turnos) {
             free(hash_esp);
             lista_iter_destruir(iter);
@@ -240,25 +252,69 @@ void clinica_atender_siguiente(clinica_t *clinica,char **params){
 }
 
 void clinica_informe_doctores(clinica_t *clinica, char **params){
-    doctor_t *doc1 = abb_obtener(clinica->abb_doctores,params[0]);
-    if(!doc1 && strcmp(params[0],"") != 0){
-        fprintf(stdout,ENOENT_DOCTOR,params[0]);
+    // doctor_t *doc1 = abb_obtener(clinica->abb_doctores,params[0]);
+    // if(!doc1 && strcmp(params[0],"") != 0){
+    //     fprintf(stdout,ENOENT_DOCTOR,params[0]);
+    //     return;
+    // }
+    // doc1 = abb_obtener(clinica->abb_doctores,params[1]);
+    // if(!doc1 && strcmp(params[1],"") != 0){
+    //     fprintf(stdout,ENOENT_DOCTOR,params[1]);
+    //     return;
+    // }
+    if(abb_cantidad(clinica->abb_doctores) == 0){
+        fprintf(stdout,DOCTORES_SISTEMA,abb_cantidad(clinica->abb_doctores));
         return;
     }
-    doc1 = abb_obtener(clinica->abb_doctores,params[1]);
-    if(!doc1 && strcmp(params[1],"") != 0){
-        fprintf(stdout,ENOENT_DOCTOR,params[1]);
+    lista_t *lista_informe = lista_crear();
+    if(!lista_informe){
         return;
     }
     abb_iter_t *abb_iter = abb_iter_in_crear(clinica->abb_doctores,params[0],params[1]);
-    size_t i = 1;
+    if(!abb_iter){
+        lista_destruir(lista_informe,NULL);
+        return;
+    }
+    // if(strcmp(abb_iter_in_ver_actual(abb_iter),params[1]) > 0 && strcmp(abb_iter_in_ver_actual(abb_iter),params[0]) < 0){
+    //     fprintf(stdout,DOCTORES_SISTEMA,(size_t)0);
+    //     lista_destruir(lista_informe,NULL);
+    //     return;
+    // }
+    // if(strcmp(abb_iter_in_ver_actual(abb_iter),params[1]) < 0 && strcmp(abb_iter_in_ver_actual(abb_iter),params[0]) < 0){
+    //     fprintf(stdout,DOCTORES_SISTEMA,(size_t)0);
+    //     lista_destruir(lista_informe,NULL);
+    //     return;
+    // }
+    //fprintf(stdout,DOCTORES_SISTEMA,abb_cantidad(clinica->abb_doctores));
+    size_t contador_doc = 0;
+    // while(!abb_iter_in_al_final(abb_iter)){
+    //     doctor_t *doc = abb_obtener(clinica->abb_doctores,abb_iter_in_ver_actual(abb_iter));
+    //     fprintf(stdout,INFORME_DOCTOR,i++,doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
+    //     if(!abb_iter_in_avanzar(abb_iter))
+    //         break;
+    // }
     while(!abb_iter_in_al_final(abb_iter)){
         doctor_t *doc = abb_obtener(clinica->abb_doctores,abb_iter_in_ver_actual(abb_iter));
-        fprintf(stdout,INFORME_DOCTOR,i++,doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
+        lista_insertar_ultimo(lista_informe,doc);
+        contador_doc++;
         if(!abb_iter_in_avanzar(abb_iter))
             break;
     }
     abb_iter_in_destruir(abb_iter);
+    lista_iter_t *iter_lista = lista_iter_crear(lista_informe);
+    if(!iter_lista){
+        lista_destruir(lista_informe,NULL);
+        return;
+    }
+    fprintf(stdout,DOCTORES_SISTEMA,contador_doc);
+    size_t i = 1;
+    while(!lista_iter_al_final(iter_lista)){
+        doctor_t *doc = lista_iter_ver_actual(iter_lista);
+        fprintf(stdout,INFORME_DOCTOR,i++,doctor_nombre(doc),doctor_especialidad(doc),doctor_cantidad_pacientes_atendidos(doc));
+        lista_iter_avanzar(iter_lista);
+    }
+    lista_iter_destruir(iter_lista);
+    lista_destruir(lista_informe,NULL);
 }
 
 void clinica_destruir(clinica_t *clinica){
