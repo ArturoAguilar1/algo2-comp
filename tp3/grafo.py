@@ -14,7 +14,7 @@ class Grafo:
             self.vertices[vertice] = {}
             self.cant_vertices += 1
         else: #Solo para probar el grafo, despues habria que borrar este else
-             print("Vertice: '%s' ya existe" % str(clave_vertice))
+             print("Vertice: '%s' ya existe" % str(vertice))
     
     def borrar_vertice(self, vertice):
         if vertice not in self.vertices:
@@ -31,13 +31,20 @@ class Grafo:
         if v1 not in self.vertices or v2 not in self.vertices:
             return False
         self.vertices[v1][v2] = peso
+        if not self.es_nodirigido:      #Si el grafo es no dirigido, se tiene que agregar la arista de "vuelta"
+            self.vertices[v2][v1] = peso
 
 
-    def borrar_arista(self, arista)
+    def borrar_arista(self, v1, v2):
+        if v1 not in self.vertices or v2 not in self.vertices:
+            return False
+        self.vertices[v1].pop(v2)
+        return True
+        
 
     def adyacentes(self, vertice):
-
-    def vertice_en_grafo(self, vertice)
+        if vertice in self.vertices:
+            return self.vertices[vertice].keys()
 
     def obtener_vertice(self, vertice):
         if vertice in self.vertices:
@@ -48,7 +55,21 @@ class Grafo:
     def vertice_pertenece(self, vertice):
         return vertice in self.vertices
 
+    def vertices_cantidad(self):
+        #o se puede hacer con un len(self.vertices)
+        return self.cant_vertices
+    
+    def estan_conectados(self,v1,v2):
+        return v2 in self.vertices[v1]
+    
+    def obtener_todos_vertices(self):
+        #Ver despues si habria que devolver una copia de los vertices, como enadyacentes
+        return self.vertices.keys()
 
+    def obtener_peso(self, v1, v2):
+        if v1 not in self.vertices or v2 not in self.vertices:
+            return False
+        return self.vertices[v1][v2]
 
     def __iter__(self):
         return iter(self.vertices)

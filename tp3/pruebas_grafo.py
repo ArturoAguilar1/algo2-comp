@@ -1,4 +1,6 @@
-from grafo import *
+from grafo import Grafo
+
+
 
 
 
