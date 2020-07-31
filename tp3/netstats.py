@@ -2,6 +2,7 @@
 
 import random
 import sys
+from collections import deque
 
 import biblioteca
 

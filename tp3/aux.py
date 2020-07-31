@@ -3,9 +3,9 @@ TDA Grafo
 '''
 
 class Grafo:
-    def __init__(self, es_dirigido):
+    def __init__(self, es_nodirigido = False):
         self.vertices = {}
-        self.es_dirigido = es_dirigido
+        self.es_nodirigido = es_nodirigido
         self.cant_vertices = 0
     
 
@@ -31,7 +31,7 @@ class Grafo:
         if v1 not in self.vertices or v2 not in self.vertices:
             return False
         self.vertices[v1][v2] = peso
-        if self.es_dirigido == False:    #Si el grafo es no dirigido, se tiene que agregar la arista de "vuelta"
+        if self.es_nodirigido:      #Si el grafo es no dirigido, se tiene que agregar la arista de "vuelta"
             self.vertices[v2][v1] = peso
 
 
@@ -39,8 +39,6 @@ class Grafo:
         if v1 not in self.vertices or v2 not in self.vertices[v1]:
             return False
         self.vertices[v1].pop(v2)
-        if self.es_dirigido == False:
-            self.vertices[v2].pop(v1)
         return True
         
 
