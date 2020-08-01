@@ -12,8 +12,24 @@ def listar_operaciones():
         print(cmd)
         #print(dicc_comandos.keys())
 
-def camino():
-    print("camino")
+#Complejidad: O(P+L), P: Cant de paginas, L cantidad de links
+def camino(grafo, origen, destino):
+    padres, orden = biblioteca.camino_minimo_bfs(grafo, origen, destino)
+    #print(orden[destino])
+    if destino not in orden:
+        print("no hay camino posible")
+        return None
+    pila = deque()
+    aux = destino
+    while aux != origen:
+        pila.append(aux)
+        aux = padres[aux]
+
+    pila.append(origen)
+    camino = []
+    while pila:
+        camino.append(pila.pop())
+    return camino, orden[destino]
 
 def mas_importantes():
     print("mas importantes")
@@ -44,11 +60,18 @@ def main():
     
     grafo = Grafo(True)
     netstats_crear(sys.argv[1],grafo)
-    print(grafo.vertices_cantidad())
+    cam, costo = camino(grafo, "Boca Juniors", "Australia")
+    print(cam)
+    x = ' '
+    print("Costo:"+x+str(costo))
+    #biblioteca.bfs(grafo,"A")
+    """print(grafo.vertices_cantidad())
     print(grafo.vertice_aleatorio())
-    print(grafo.adyacentes("Fototropismo"))
-    print(len(grafo.adyacentes("Fototropismo")))
-    print(grafo.vertice_pertenece("planeta"))
+    print(grafo.adyacentes("A"))
+    print(grafo.adyacentes("B"))
+    print(grafo.adyacentes("C"))
+    print(grafo.adyacentes("T"))"""
+
     #print(grafo.estan_conectados("Miniatura","Luis XIV"))
     """
     

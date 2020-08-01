@@ -1,2 +1,4 @@
-A,B,E,R,T,X,Q
-C,A,T,U,I,W,N
+A,B,E,R,T
+B,E,D,S,C
+C,A,W,Z,T
+T,Y,R,Z,S
