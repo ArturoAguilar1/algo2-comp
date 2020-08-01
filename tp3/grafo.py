@@ -2,6 +2,7 @@
 TDA Grafo 
 '''
 
+import random
 class Grafo:
     def __init__(self, es_dirigido):
         self.vertices = {}
@@ -13,8 +14,8 @@ class Grafo:
         if vertice not in self.vertices:
             self.vertices[vertice] = {}
             self.cant_vertices += 1
-        else: #Solo para probar el grafo, despues habria que borrar este else
-             print("Vertice: '%s' ya existe" % str(vertice))
+        #else: #Solo para probar el grafo, despues habria que borrar este else
+        #    print("Vertice: '%s' ya existe" % str(vertice))
     
     def borrar_vertice(self, vertice):
         if vertice not in self.vertices:
@@ -33,6 +34,7 @@ class Grafo:
         self.vertices[v1][v2] = peso
         if self.es_dirigido == False:    #Si el grafo es no dirigido, se tiene que agregar la arista de "vuelta"
             self.vertices[v2][v1] = peso
+        return True
 
 
     def borrar_arista(self, v1, v2):
@@ -54,6 +56,9 @@ class Grafo:
         else:
             return None
     
+    def vertice_aleatorio(self):
+        return random.choice(list(self.vertices.keys()))
+
     def vertice_pertenece(self, vertice):
         return vertice in self.vertices
 

@@ -1,48 +1,82 @@
 #!/usr/bin/python3
-
+# -*- coding: utf-8 -*-
 import random
 import sys
 from collections import deque
-
+from grafo import Grafo
 import biblioteca
 
+def listar_operaciones():
+    for cmd in dicc_comandos.keys():
+        if cmd == 'listar_operaciones': continue
+        print(cmd)
+        #print(dicc_comandos.keys())
 
-graph = {
-    'A' : {'B' : '', 'C': ''},
-    'B' : {'A' : '4', 'D': '8'},
-    'C' : {'D': '0'},
-    'D' : {'B': '2'}
-}
+def camino():
+    print("camino")
 
+def mas_importantes():
+    print("mas importantes")
+
+def conectados():
+    print("conectados")
+
+
+
+def netstats_crear(ruta_archivo,grafo):
+    datos = []
+    with open(ruta_archivo) as wiki:
+        for linea in wiki:
+            linea = linea.strip()
+            datos = linea.split('\t')
+            i = 0
+            for i in range(len(datos)):
+                #print(datos[i])
+                grafo.agregar_vertice(datos[i]) 
+            for w  in range(1,len(datos)):
+                grafo.agregar_arista(datos[0],datos[w])
+
+    wiki.close()
 
 def main():
-    Dicc=set(["ArturoAguilar","Hola","Buenas","Dijkstra"])
-    d = 0
-    for d in Dicc:
-        if "Buenas" in Dicc:
-            print("El buenas esta en dicc")
-            break
-        else:
-            print(d)
+    if len(sys.argv) != 2:
+        print("Cantidad de parametros inválidos")
     
-    #for clave in graph.items():
-        #elemenetos = ",".join(valor.keys())
-#    print(graph.keys())
- #   print(graph.values())
-  #  print(graph.items())
-    print(len(graph))
-    if 'C' in graph:
-        del graph['C']
-    print(len(graph))
-    print(graph.keys())
-    graph['Z'] = {'A':' '}
-    print(graph.keys())
-    print(graph.items())
-    for v in graph.values():
-        if 'B' in v:
-            v.pop('B')
-    print(graph.keys())
-    print(graph.items())
+    grafo = Grafo(True)
+    netstats_crear(sys.argv[1],grafo)
+    print(grafo.vertices_cantidad())
+    print(grafo.vertice_aleatorio())
+    print(grafo.adyacentes("Fototropismo"))
+    print(len(grafo.adyacentes("Fototropismo")))
+    print(grafo.vertice_pertenece("planeta"))
+    #print(grafo.estan_conectados("Miniatura","Luis XIV"))
+    """
+    
+    print(grafo.adyacentes('A'))
+    print(grafo.adyacentes('C'))
+    grafo.borrar_arista('A','T')
+    print(grafo.adyacentes('A'))
+    print(grafo.adyacentes('B'))
+    print(grafo.vertice_aleatorio())
+    #print(grafo.estan_conectados("Ottawa","Toronto"))
+    """
+    
 
 #if __name__ == "__main__":
+
+dicc_comandos = {
+    'listar_operaciones': listar_operaciones,
+    'camino': camino,
+    'mas_importantes': mas_importantes,
+    'conectados': conectados
+}
+
 main()
+
+"""
+    if sys.argv[1] in dicc_comandos:
+        dicc_comandos[sys.argv[1]]()
+    else:
+        print("no esta en comandos")
+    #listar_operaciones()
+"""

@@ -1,0 +1,2 @@
+A,B,E,R,T,X,Q
+C,A,T,U,I,W,N
