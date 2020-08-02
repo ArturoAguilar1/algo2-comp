@@ -34,10 +34,21 @@ def camino(grafo, origen, destino):
 def mas_importantes():
     print("mas importantes")
 
-def conectados():
-    print("conectados")
+#Complejidad: O(P+L)
+def conectados(grafo, origen):
+    visitados = set()
+    apilados = set()
+    todas_cfc = []
+    orden = dict()
+    mb = dict()
+    biblioteca.cfcs(grafo, origen, apilados, mb, visitados, todas_cfc, orden)
+    print(todas_cfc)
 
 
+def diametro(grafo):
+    costo, distancias = biblioteca.diametro(grafo)
+    print(distancias)
+    print(costo)
 
 def netstats_crear(ruta_archivo,grafo):
     datos = []
@@ -60,10 +71,12 @@ def main():
     
     grafo = Grafo(True)
     netstats_crear(sys.argv[1],grafo)
-    cam, costo = camino(grafo, "Boca Juniors", "Australia")
+    diametro(grafo)
+    """cam, costo = camino(grafo, "Boca Juniors", "Australia")
     print(cam)
     x = ' '
-    print("Costo:"+x+str(costo))
+    print("Costo:"+x+str(costo))"""
+    #conectados(grafo, "Boca Juniors")
     #biblioteca.bfs(grafo,"A")
     """print(grafo.vertices_cantidad())
     print(grafo.vertice_aleatorio())
@@ -91,7 +104,8 @@ dicc_comandos = {
     'listar_operaciones': listar_operaciones,
     'camino': camino,
     'mas_importantes': mas_importantes,
-    'conectados': conectados
+    'conectados': conectados,
+    'diametro': diametro
 }
 
 main()
