@@ -103,6 +103,8 @@ def navegacion(grafo, origen):
         n += 1
     print(*recorrido, sep=' -> ')
 
+def lectura(grafo,paginas):
+    return True
 
 def netstats_crear(ruta_archivo,grafo):
     datos = []
@@ -193,7 +195,8 @@ dicc_comandos = {
     'diametro': diametro,
     'ciclo': ciclo_n,
     'rango': rango,
-    'navegación': navegacion
+    'navegación': navegacion,
+    'lectura': lectura
 }
 
 main()
