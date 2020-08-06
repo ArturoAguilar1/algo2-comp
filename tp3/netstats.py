@@ -42,7 +42,7 @@ def mas_importantes():
 def diametro(grafo):
     costo, distancias, padres, aux_origen = biblioteca.diametro(grafo)
     with open("text.text",'w') as fp:
-        print(distancias, file = fp)
+        print(distancias, file=fp)
     fp.close()
     aux_final = list(distancias.keys())[list(distancias.values()).index(costo)]
     pila = deque()
@@ -103,7 +103,47 @@ def navegacion(grafo, origen):
         n += 1
     print(*recorrido, sep=' -> ')
 
+def orden_topologico(grafo):
+    grados = {}
+    for v in grafo:
+        grados[v] = 0
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            grados[w] += 1
+    q = deque()
+    for v in grafo:
+        if grados[v] == 0:
+            q.append(v)
+    resul = []
+    while q:
+        v = q.popleft()
+        resul.append(v)
+        for w in grafo.adyacentes(v):
+            grados[w] -= 1
+            if grados[w] == 0:
+                q.append(w)
+    if len(resul) == len(grafo.obtener_todos_vertices()):
+        return resul
+    else:
+        return "No existe forma de leer las paginas en orden" # El grafo tiene algun ciclo
+
+
 def lectura(grafo,paginas):
+    grafo_aux = Grafo(True)
+    for v in paginas:               #O(n)
+        grafo_aux.agregar_vertice(v)
+
+    for i in range(len(paginas) - 1):
+        p1 = paginas[i]
+        p2 = paginas[i+1]
+        if p2 in grafo.adyacentes(p1):
+            grafo_aux.agregar_arista(p2,p1)
+    
+    #print(grafo_aux.adyacentes("Buenos Aires"))
+    #print(grafo_aux.adyacentes("Roma"))
+    print(orden_topologico(grafo_aux))
+    #print(grafo_aux.obtener_todos_vertices())
+
     return True
 
 def netstats_crear(ruta_archivo,grafo):
@@ -129,7 +169,8 @@ def grados_salida_dirigido(grafo):
     return grados
 
 def conectados(grafo, origen):
-    return biblioteca.cfc_tarjan(grafo)
+    return True
+    #return biblioteca.cfc_tarjan(grafo)
     #print(todas_cfc)
 
 def main():
@@ -138,16 +179,12 @@ def main():
     sys.setrecursionlimit(5000)
     grafo = Grafo(True)
     netstats_crear(sys.argv[1],grafo)
-    #diametro(grafo)
-    #aux = list(grafo.adyacentes("Brasil"))
-    #print(aux[0])
-    navegacion(grafo, "Argentina")
-    navegacion(grafo, "Alemania")
-    navegacion(grafo, "queso")
-    navegacion(grafo, "Bolivia")
-    navegacion(grafo, "Brasil")
 
-
+    paginas = ['Buenos Aires','Roma']
+    paginas2= ['Hockey sobre hielo','Roma','Japón','árbol','Guerra','Dios','universo'
+    ,'Himalaya','otoño']
+    print(paginas2)
+    lectura(grafo, paginas2)
 
     #print(rango(grafo, "Perón", 4))
     #cfcs = conectados(grafo,"Boca Juniors")
