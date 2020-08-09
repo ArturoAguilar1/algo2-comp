@@ -103,45 +103,39 @@ def navegacion(grafo, origen):
         n += 1
     print(*recorrido, sep=' -> ')
 
-def orden_topologico(grafo):
-    grados = {}
-    for v in grafo:
-        grados[v] = 0
-    for v in grafo:
-        for w in grafo.adyacentes(v):
-            grados[w] += 1
-    q = deque()
-    for v in grafo:
-        if grados[v] == 0:
-            q.append(v)
-    resul = []
-    while q:
-        v = q.popleft()
-        resul.append(v)
-        for w in grafo.adyacentes(v):
-            grados[w] -= 1
-            if grados[w] == 0:
-                q.append(w)
-    if len(resul) == len(grafo.obtener_todos_vertices()):
-        return resul
-    else:
-        return "No existe forma de leer las paginas en orden" # El grafo tiene algun ciclo
-
 
 def lectura(grafo,paginas):
     grafo_aux = Grafo(True)
     for v in paginas:               #O(n)
         grafo_aux.agregar_vertice(v)
+    print(grafo.adyacentes("Hockey sobre hielo"))
+    for v in paginas:
+        for w in grafo.adyacentes(v):
+            if w in paginas:
+                #print(f"{w}: está en los adyacentes de {v} y tmb esta en paginas")
+                grafo_aux.agregar_arista(w,v)    
 
-    for i in range(len(paginas) - 1):
-        p1 = paginas[i]
-        p2 = paginas[i+1]
-        if p2 in grafo.adyacentes(p1):
-            grafo_aux.agregar_arista(p2,p1)
+    orden = biblioteca.orden_topologico(grafo_aux)
+    print(*orden, sep=' -> ')
+    #for i in range(len(paginas) - 1):
+    #    p1 = paginas[i]
+    #    p2 = paginas[i+1]
+    #    if p1 in grafo.adyacentes(p2):
+     #       grafo_aux.agregar_arista(p1,p2)
+     #   if p2 in grafo.adyacentes(p1):
+     #       grafo_aux.agregar_arista(p2,p1)
+   # for i in range(len(paginas) - 1):
+    #    p1 = paginas[i]
+     #   for j in range(len(paginas)-1):
+      #      #print(j)
+       #     p2 = paginas[j]
+        #    if p2 in grafo.adyacentes(p1):
+         #       grafo_aux.agregar_arista(p1,p2)
+
     
     #print(grafo_aux.adyacentes("Buenos Aires"))
     #print(grafo_aux.adyacentes("Roma"))
-    print(orden_topologico(grafo_aux))
+    
     #print(grafo_aux.obtener_todos_vertices())
 
     return True
@@ -181,11 +175,18 @@ def main():
     netstats_crear(sys.argv[1],grafo)
 
     paginas = ['Buenos Aires','Roma']
-    paginas2= ['Hockey sobre hielo','Roma','Japón','árbol','Guerra','Dios','universo'
+    paginas2 = ['Hockey sobre hielo','Roma','Japón','árbol','Guerra','Dios','universo'
     ,'Himalaya','otoño']
     print(paginas2)
     lectura(grafo, paginas2)
-
+    #print("universo" in grafo.adyacentes("otoño"))
+    #print("universo" in grafo.adyacentes("Himalaya"))
+    #print("universo" in grafo.adyacentes("Dios"))
+    #print("universo" in grafo.adyacentes("Guerra"))
+    #print("universo" in grafo.adyacentes("árbol"))
+    #print("universo" in grafo.adyacentes("Hockey sobre hielo"))
+    #print("universo" in grafo.adyacentes("Japón"))
+    #print("universo" in grafo.adyacentes("Roma"))
     #print(rango(grafo, "Perón", 4))
     #cfcs = conectados(grafo,"Boca Juniors")
     #with open("text.txt",'w') as f:

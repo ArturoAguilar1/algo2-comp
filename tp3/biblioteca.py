@@ -82,6 +82,29 @@ def diametro(grafo):
     return max_min_dist, aux_distancias, aux_padres, aux_origen
 
 
+def orden_topologico(grafo):
+    grados = {}
+    for v in grafo:
+        grados[v] = 0
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            grados[w] += 1
+    q = deque()
+    for v in grafo:
+        if grados[v] == 0:
+            q.append(v)
+    resul = []
+    while q:
+        v = q.popleft()
+        resul.append(v)
+        for w in grafo.adyacentes(v):
+            grados[w] -= 1
+            if grados[w] == 0:
+                q.append(w)
+    if len(resul) == len(grafo.obtener_todos_vertices()):
+        return resul
+    else:
+        return "No existe forma de leer las paginas en orden" # El grafo tiene algun ciclo
 
 def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
     pila = deque()
