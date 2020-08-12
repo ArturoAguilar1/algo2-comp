@@ -1,7 +1,7 @@
 '''
 TDA Grafo 
 '''
-
+# -*- coding: utf-8 -*-
 class Grafo:
     def __init__(self, es_nodirigido = False):
         self.vertices = {}
@@ -111,3 +111,78 @@ class Grafo:
 }
 
 """
+
+    """
+    try:
+        if heap[0] is not None:
+            print("El heap no está vacio")
+            result = primeros_k(heap,ranks,k)
+            print(result)
+    except IndexError:
+        print("Heap vacio, hago el calculo una vez")
+        pagerank(grafo,ranks)
+        print(ranks["Argentina"])
+        items = crear_heap_desde_dicc(heap,ranks,k)
+        result = primeros_k(heap,items,k)
+        print(result)"""
+
+    #print(aristas_entrada["Buenos Aires"])
+    #result = primeros_k(heap,ranks,20)
+    #print(result)
+    """
+    
+    print(ranks["Estados Unidos"])
+    print(ranks["Buenos Aires"])
+    print(ranks["España"])
+    print(ranks["Francia"])
+    print(ranks["Provincias de la Argentina"])
+    print(ranks["Magnoliophyta"])
+    print(ranks["Alemania"])
+    print(ranks["México"])
+    print(ranks["Reino Unido"])
+    print(ranks["Europa"])
+    print(ranks["Italia"])
+    print(ranks["Brasil"])
+    print(ranks["Chile"])
+    print(ranks["Perú"])
+    print(ranks["Uruguay"])
+    print(ranks["Colombia"])"""
+
+def primeros_k_bis(heap_min,items,k):
+    for i in range(k,len(items)):
+        valor = items[i][0]
+        min_max_v = heap_min[0][0]
+        if valor > min_max_v:
+            heappushpop(heap_min,items[i])
+    resultado = deque()
+    while heap_min:
+        resultado.appendleft(heappop(heap_min)[1])
+    return list(resultado)
+"""
+    #for _ in range(limite_iteraciones):
+    #    dicc_aux = {}
+    #    for v in grafo:
+    #        dicc_aux[v] = (1 - d) / N
+    #    for v in grafo:
+    #        for w in grafo.adyacentes(v):
+    #            try:
+    #                dicc_aux[w] += d * (ranks[v] / grados_entrada[v])
+    #            except ZeroDivisionError:
+    #                continue
+    #        ranks[v] = dicc_aux[v]
+    
+    for v in grafo:
+        try:
+            ranks[v] = (1 - d)/N +  d * sum([ranks[x] / grados_entrada[x] for x in aristas_entrada[v]])
+        except ZeroDivisionError:
+            continue
+      
+    N = grafo.vertices_cantidad()
+    for v in grafo:
+        ranks[v] = 0
+    for _ in range(limite_iteraciones):
+        for v in grafo:
+            try:
+                ranks[v] = (1 - d)/N +  d *sum([ranks[x] / grados_salida[x] for x in aristas_entrada[v]])
+            except ZeroDivisionError:
+                continue"""

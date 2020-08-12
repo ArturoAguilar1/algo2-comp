@@ -20,7 +20,6 @@ class Grafo:
     def borrar_vertice(self, vertice):
         if vertice not in self.vertices:
             return False
-        #del self.vertices[vertice]
         for w in self.vertices.values():
             if vertice in w:
                 w.pop(vertice)

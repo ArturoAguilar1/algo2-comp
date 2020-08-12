@@ -1,24 +1,27 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
+
 import random
 import sys
 from collections import deque
 from grafo import Grafo
 import biblioteca
-import json
 
-def listar_operaciones():
+
+def listar_operaciones(grafo,args):
     for cmd in dicc_comandos.keys():
         if cmd == 'listar_operaciones': continue
         print(cmd)
-        #print(dicc_comandos.keys())
 
-#Complejidad: O(P+L), P: Cant de paginas, L cantidad de links
-def camino(grafo, origen, destino):
+def _camino(grafo, origen, destino):
+    if not grafo.vertice_pertenece(origen):
+        print ("No existe el origen indicado")
+        return None
+    if not grafo.vertice_pertenece(destino):
+        print ("No existe el destino indicado")
+        return None
     padres, orden = biblioteca.camino_minimo_bfs(grafo, origen, destino)
-    #print(orden[destino])
-    if destino not in orden:
-        print("no hay camino posible")
+    if destino not in padres:
+        print("No se encontro recorrido")
         return None
     pila = deque()
     aux = destino
@@ -30,64 +33,105 @@ def camino(grafo, origen, destino):
     camino = []
     while pila:
         camino.append(pila.pop())
+    print(*camino, sep=' -> ')
     x = ' '
     print("Costo:"+x+str(orden[destino]))
-    #return camino, orden[destino]
 
-def mas_importantes():
-    print("mas importantes")
+def camino(grafo, args):
+    """print(args[0])
+    print(args[1])
+    print(len(args))
+    return None
+    for p in args:
+        aux = p.split(",")"""
+    if len(args) != 2:
+        print("Cantidad de parametros incorrectos en 'camino'.")
+        return None
+    return _camino(grafo,args[0],args[1])
 
-#Complejidad: O(P+L)
 
-def diametro(grafo):
+
+
+def diametro(grafo,args):
     costo, distancias, padres, aux_origen = biblioteca.diametro(grafo)
-    with open("text.text",'w') as fp:
-        print(distancias, file=fp)
-    fp.close()
     aux_final = list(distancias.keys())[list(distancias.values()).index(costo)]
     pila = deque()
     aux = aux_final
     while aux != aux_origen:
         pila.append(aux)
         aux = padres[aux]
-
     pila.append(aux_origen)
     camino = []
     while pila:
         camino.append(pila.pop())
-    #'->'.join(map(str,camino))
     print(*camino, sep=' -> ')
-    #pila = deque()
-    #print(distancias)
     x = ' '
     print("Costo:"+x+str(costo))
 
-def ciclo_n(grafo, origen, n):
+def _ciclo_n(grafo, origen, n):
     if not grafo.vertice_pertenece(origen):
-        print("no existe el vertice")
+        print("No se encontro el recorrido")
         return None
     sol_parcial = []
     visitados = set()
     sol_parcial.append(origen)
     visitados.add(origen)
-    ciclo = biblioteca.dfs_ciclo(grafo, origen, origen, visitados, sol_parcial, n)
+    #ciclo = biblioteca.dfs_ciclo_n(grafo, origen, origen, visitados, sol_parcial, n)
+    ciclo = biblioteca.dfs_ciclo_largo_n(grafo,origen,origen,n,visitados,sol_parcial)
     if ciclo == None:
         print("No se encontro el recorrido")
     else:
-        print(ciclo)
+        ciclo.append(origen)
+        print(*ciclo, sep=' -> ')
 
+def ciclo_n(grafo, args):
+    if len(args) != 2:
+        print("Cantidad de parametros incorrectos en 'ciclo'")
+        return None
+    try:
+        n = int(args[1])
+    except ValueError:
+        print("Error al indicar el numero n")
+        return None
+    if n > 0:
+        return _ciclo_n(grafo,args[0],n)
+    else:
+        print("Error, ingrese un numero positivo válidio")
 
-def rango(grafo, origen, n):
+def _rango(grafo, origen, n):
+    if not grafo.vertice_pertenece(origen):
+        print("No existe la página indicada")
+        return None
     padres, orden = biblioteca.bfs_rango(grafo, origen, n)
     cont = 0
     for v in orden:
         if orden[v] == n:
             cont += 1
-    return cont
+    print(cont)
 
-def navegacion(grafo, origen):
-    if grafo.vertice_pertenece(origen) == False:
-        return "No existe el origen en NetStats"
+def rango(grafo,args):
+    if len(args) != 2:
+        print("Cantidad de parametros incorrectos en 'rango'")
+        return None
+    
+    try:
+        n = int(args[1])
+    except ValueError:
+        print("Error al indicar el numero n")
+        return None
+    if n > 0:
+        return _rango(grafo,args[0],n)
+    else:
+        print("Error, ingrese un numero postivio")
+
+def navegacion(grafo, args):
+    if len(args) != 1:
+        print("Error al invocar el comando 'navegacion'")
+        return None
+    origen = args[0]
+    if not grafo.vertice_pertenece(origen):
+        print("No existe el origen en NetStats")
+        return None
     recorrido = []
     recorrido.append(origen)
     aux = list(grafo.adyacentes(origen))
@@ -104,41 +148,50 @@ def navegacion(grafo, origen):
     print(*recorrido, sep=' -> ')
 
 
+def comunidad(grado,pagina):
+    return True
+
+def clustering(grafo, args):
+    if len(args) > 1:
+        print("Error al invocar el comando 'clustering'")
+        return None
+    pagina = args[0]
+    if not grafo.vertice_pertenece(pagina):
+        print("No existe la pagina indicada en NetStats")
+        return None
+    if pagina == "":
+        aux = biblioteca.clustering_red(grafo)
+        print("%.3f" % aux)
+    else:
+        aux = biblioteca.clustering_vertice(grafo,pagina)
+        print("%.3f" % aux)
+
+def validar_vertices(grafo,paginas):
+    no_pertencen = []
+    for v in paginas:
+        if not grafo.vertice_pertenece(v):
+            no_pertencen.append(v)
+    return no_pertencen
+
 def lectura(grafo,paginas):
     grafo_aux = Grafo(True)
+    #result = validar_vertices(grafo,paginas)
+    #print(result)
     for v in paginas:               #O(n)
         grafo_aux.agregar_vertice(v)
-    print(grafo.adyacentes("Hockey sobre hielo"))
     for v in paginas:
+        if not grafo.vertice_pertenece(v):
+            continue
         for w in grafo.adyacentes(v):
             if w in paginas:
                 #print(f"{w}: está en los adyacentes de {v} y tmb esta en paginas")
                 grafo_aux.agregar_arista(w,v)    
 
     orden = biblioteca.orden_topologico(grafo_aux)
-    print(*orden, sep=' -> ')
-    #for i in range(len(paginas) - 1):
-    #    p1 = paginas[i]
-    #    p2 = paginas[i+1]
-    #    if p1 in grafo.adyacentes(p2):
-     #       grafo_aux.agregar_arista(p1,p2)
-     #   if p2 in grafo.adyacentes(p1):
-     #       grafo_aux.agregar_arista(p2,p1)
-   # for i in range(len(paginas) - 1):
-    #    p1 = paginas[i]
-     #   for j in range(len(paginas)-1):
-      #      #print(j)
-       #     p2 = paginas[j]
-        #    if p2 in grafo.adyacentes(p1):
-         #       grafo_aux.agregar_arista(p1,p2)
-
-    
-    #print(grafo_aux.adyacentes("Buenos Aires"))
-    #print(grafo_aux.adyacentes("Roma"))
-    
-    #print(grafo_aux.obtener_todos_vertices())
-
-    return True
+    if orden:
+        print(*orden, sep=' -> ')
+    else:
+        print("No existe forma de leer las paginas en orden")
 
 def netstats_crear(ruta_archivo,grafo):
     datos = []
@@ -148,101 +201,65 @@ def netstats_crear(ruta_archivo,grafo):
             datos = linea.split('\t')
             i = 0
             for i in range(len(datos)):
-                #print(datos[i])
                 grafo.agregar_vertice(datos[i]) 
             for w  in range(1,len(datos)):
                 grafo.agregar_arista(datos[0],datos[w])
 
     wiki.close()
-
-def grados_salida_dirigido(grafo):
-    grados = {}
-    for v in grafo.obtener_todos_vertices():
-        grados[v] = len(grafo.adyacentes(v))
-
-    return grados
-
+"""
 def conectados(grafo, origen):
-    return True
-    #return biblioteca.cfc_tarjan(grafo)
-    #print(todas_cfc)
+    todas_cfc =  biblioteca.cfc_tarjan(grafo)
+    print(len(todas_cfc))"""
+
+
+def mas_importantes(grafo,args):
+    if len(args) > 1:
+        print("Error al invocar los argumentos del comando 'mas importantes'")
+        return None
+    try:
+        n = int(args[0])
+    except ValueError:
+        print("Error al indicar el numero n de paginas mas importantes")
+        return None
+
+    resultado = biblioteca._mas_importantes(grafo,n)
+    new_list = [ seq[1] for seq in resultado ]
+    print(*new_list, sep=', ')
 
 def main():
     if len(sys.argv) != 2:
         print("Cantidad de parametros inválidos")
-    sys.setrecursionlimit(5000)
+    
     grafo = Grafo(True)
     netstats_crear(sys.argv[1],grafo)
+    print(grafo.vertice_pertenece("Eduardo VI de Inglaterra"))
+    print(grafo.vertice_pertenece("complejidad computacional"))
 
-    paginas = ['Buenos Aires','Roma']
-    paginas2 = ['Hockey sobre hielo','Roma','Japón','árbol','Guerra','Dios','universo'
-    ,'Himalaya','otoño']
-    print(paginas2)
-    lectura(grafo, paginas2)
-    #print("universo" in grafo.adyacentes("otoño"))
-    #print("universo" in grafo.adyacentes("Himalaya"))
-    #print("universo" in grafo.adyacentes("Dios"))
-    #print("universo" in grafo.adyacentes("Guerra"))
-    #print("universo" in grafo.adyacentes("árbol"))
-    #print("universo" in grafo.adyacentes("Hockey sobre hielo"))
-    #print("universo" in grafo.adyacentes("Japón"))
-    #print("universo" in grafo.adyacentes("Roma"))
-    #print(rango(grafo, "Perón", 4))
-    #cfcs = conectados(grafo,"Boca Juniors")
-    #with open("text.txt",'w') as f:
-    #    print(cfcs, file=f)
-    #f.close()
-    #print(cfcs)
-    #print("Roma" in grafo.adyacentes("Japón"))
-    #print(grafo.adyacentes("Japón"))
-    #diametro(grafo)
-    #ciclo_n(grafo,"Rock de Argentina",2)
-    #print(grafo.adyacentes("Arte"))
-    """cam, costo = camino(grafo, "Boca Juniors", "Australia")
-    print(cam)˙
+    for cmd in sys.stdin:
+        args = cmd.split(' ')
+        comando = args[0].strip()
+        argumentos = [x.strip() for x in ' '.join(args[1:]).split(',')]
+        if comando in dicc_comandos:
+            dicc_comandos[comando](grafo,argumentos)
+        else:
+            print("Ingrese un comando válido para")
+            continue
 
-    #conectados(grafo, "Boca Juniors")
-    #biblioteca.bfs(grafo,"A")"""
-    """print(grafo.vertices_cantidad())
-    print(grafo.vertice_aleatorio())
-    print(grafo.adyacentes("A"))
-    print(grafo.adyacentes("B"))
-    print(grafo.adyacentes("C"))
-    print(grafo.adyacentes("T"))"""
-
-    #print(grafo.estan_conectados("Miniatura","Luis XIV"))
-    """
-    
-    print(grafo.adyacentes('A'))
-    print(grafo.adyacentes('C'))
-    grafo.borrar_arista('A','T')
-    print(grafo.adyacentes('A'))
-    print(grafo.adyacentes('B'))
-    print(grafo.vertice_aleatorio())
-    #print(grafo.estan_conectados("Ottawa","Toronto"))
-    """
-    
 
 #if __name__ == "__main__":
 
 dicc_comandos = {
-    'listar_operaciones': listar_operaciones,
-    'camino': camino,
-    'mas_importantes': mas_importantes,
-    'conectados': conectados,
-    'diametro': diametro,
-    'ciclo': ciclo_n,
-    'rango': rango,
-    'navegación': navegacion,
-    'lectura': lectura
+    "listar_operaciones": listar_operaciones,
+    "camino": camino, #OK-CORRECTOR
+    'mas_importantes': mas_importantes, #OK-CORRECTOR
+    "diametro": diametro, #OK-CORRECTOR
+    'ciclo': ciclo_n, #OK
+    'rango': rango, #OK - CORRECTOR
+    'navegacion': navegacion, #OK - CORRECTOR
+    'lectura': lectura, #CREO OK
+    #'comunidad' : comunidad,
+    'clustering' : clustering #CREO OK,
+    #'conectados': conectados
 }
 
 main()
-
-"""
-    if sys.argv[1] in dicc_comandos:
-        dicc_comandos[sys.argv[1]]()
-    else:
-        print("no esta en comandos")
-    #listar_operaciones()
-"""
