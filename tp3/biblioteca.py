@@ -93,7 +93,7 @@ def orden_topologico(grafo):
             q.append(v)
     resul = []
     while q:
-        v = q.popleft()
+        v = q.pop()
         resul.append(v)
         for w in grafo.adyacentes(v):
             grados[w] -= 1
@@ -131,21 +131,21 @@ def pila_a_lista(pila):
 
 def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
     pila = deque()
-    visitados.add(v)
+    visitados.append(v)
     mb[v] = orden[v]
     pila.appendleft(v)
-    apilados.add(v)
+    apilados.append(v)
     
-    for w in grafo.adyacentes[v]:
+    for w in grafo.adyacentes(v):
         if w not in visitados:
         #print(f'{w} no esta visitado, lo visito')
             orden[w] = orden[v] + 1
             cfcs_conectividad(grafo, w, apilados, mb, visitados, todas_cfc, orden)
 
-    if w in apilados:
-      if mb[v] > mb[w]:
-        #print(f'wii {v} bajo su mb de {mb[v]} a {mb[w]} gracias a la coneccion con {w}')
-        mb[v] = min(mb[v], mb[w])
+        if w in apilados:
+            if mb[v] > mb[w]:
+                #print(f'wii {v} bajo su mb de {mb[v]} a {mb[w]} gracias a la coneccion con {w}')
+                mb[v] = min(mb[v], mb[w])
     
   
     if orden[v] == mb[v] and len(pila) > 0:
@@ -157,11 +157,17 @@ def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
             if w == v:
                 break
     
-    #print('NUEVA CFC!: ', nueva_cfc)
-    todas_cfc.append(nueva_cfc)
+        todas_cfc.append(nueva_cfc)
+    return todas_cfc
   #print(f"Termine de trabajar con {v}")
 
-def dfs_ciclo_largo_n(grafo, v, origen, n, visitados, camino_actual):
+def reconstruir_camino(sol_parcial, inicio):
+    camino = []
+    camino = sol_parcial[:]
+    camino.append(inicio)
+    return camino
+
+def dfs_ciclo_largo_n(grafo, v, origen, visitados, camino_actual, n):
     visitados.add(v)
     if len(camino_actual) == n:
         if origen in grafo.adyacentes(v):
@@ -172,7 +178,7 @@ def dfs_ciclo_largo_n(grafo, v, origen, n, visitados, camino_actual):
 
     for w in grafo.adyacentes(v):
         if w in visitados: continue
-        solucion = dfs_ciclo_largo_n(grafo, w, origen, n, visitados, camino_actual + [w])
+        solucion = dfs_ciclo_largo_n(grafo, w, origen, visitados, camino_actual + [w], n)
         if solucion is not None:
             return solucion
     visitados.remove(v)
@@ -183,25 +189,31 @@ def clustering_vertice(grafo, origen):
     aristas_entre_ady = 0
     for vj in grafo.adyacentes(origen):
         for vk in grafo.adyacentes(origen):
-            if grafo.estan_conectados(vj,vk):
+            if vj == vk:
+                continue
+            if grafo.estan_conectados(vk,vj): #or grafo.estan_conectados(vk,vj):
                 aristas_entre_ady += 1
     try:
         k = len(grafo.adyacentes(origen))
         aux = k * (k-1)
-        return aristas_entre_ady / float(aux)
+        return aristas_entre_ady / aux
     except ZeroDivisionError:
         return 0
 
 def clustering_red(grafo):
     sum_coef = 0
-    fails = 0
+    ceros = 0
+    n = grafo.vertices_cantidad()
     for v in grafo:
         c = clustering_vertice(grafo,v)
         if c == 0:
-            fails += 1
+            ceros += 1
         else:
             sum_coef += c
-    return sum_coef / (grafo.vertices_cantidad() - fails)
+    #print(ceros)
+    #print(sum_coef)
+    #print(n)
+    return (sum_coef/float(2.1)) / (n - ceros)
 
 def grados_entrada_dirigido(grafo):
     grados = {}
@@ -238,7 +250,6 @@ def primeros_k(heap,k):
     print(aux)
     #heappush(heap,aux)
     return list(resultado)
-
 
 def pagerank(grafo,ranks,limite_iteraciones = 10, d = 0.85):
     aristas_entrada = aristas_de_entrada(grafo)

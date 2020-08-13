@@ -72,12 +72,14 @@ def _ciclo_n(grafo, origen, n):
     if not grafo.vertice_pertenece(origen):
         print("No se encontro el recorrido")
         return None
+    if len(grafo.adyacentes(origen)) == 0:
+        print("No se encontro el recorrido")
+        return None
     sol_parcial = []
     visitados = set()
     sol_parcial.append(origen)
     visitados.add(origen)
-    #ciclo = biblioteca.dfs_ciclo_n(grafo, origen, origen, visitados, sol_parcial, n)
-    ciclo = biblioteca.dfs_ciclo_largo_n(grafo,origen,origen,n,visitados,sol_parcial)
+    ciclo = biblioteca.dfs_ciclo_largo_n(grafo,origen,origen,visitados,sol_parcial,n)
     if ciclo == None:
         print("No se encontro el recorrido")
     else:
@@ -156,9 +158,10 @@ def clustering(grafo, args):
         print("Error al invocar el comando 'clustering'")
         return None
     pagina = args[0]
+    """
     if not grafo.vertice_pertenece(pagina):
         print("No existe la pagina indicada en NetStats")
-        return None
+        return None"""
     if pagina == "":
         aux = biblioteca.clustering_red(grafo)
         print("%.3f" % aux)
@@ -175,13 +178,9 @@ def validar_vertices(grafo,paginas):
 
 def lectura(grafo,paginas):
     grafo_aux = Grafo(True)
-    #result = validar_vertices(grafo,paginas)
-    #print(result)
     for v in paginas:               #O(n)
         grafo_aux.agregar_vertice(v)
-    for v in paginas:
-        if not grafo.vertice_pertenece(v):
-            continue
+    for v in grafo_aux:
         for w in grafo.adyacentes(v):
             if w in paginas:
                 #print(f"{w}: está en los adyacentes de {v} y tmb esta en paginas")
@@ -189,7 +188,7 @@ def lectura(grafo,paginas):
 
     orden = biblioteca.orden_topologico(grafo_aux)
     if orden:
-        print(*orden, sep=' -> ')
+        print(*orden, sep=', ')
     else:
         print("No existe forma de leer las paginas en orden")
 
@@ -206,10 +205,18 @@ def netstats_crear(ruta_archivo,grafo):
                 grafo.agregar_arista(datos[0],datos[w])
 
     wiki.close()
-"""
+
 def conectados(grafo, origen):
-    todas_cfc =  biblioteca.cfc_tarjan(grafo)
-    print(len(todas_cfc))"""
+    pagina = origen[0]
+    mb = {}
+    orden = {}
+    cfcs = []
+    visit = []
+    apilados = []
+    orden[pagina] = 0
+    todas_cfc =  biblioteca.cfcs_conectividad(grafo,pagina,apilados,mb,visit,cfcs,orden)
+    new_list = [ seq[0] for seq in todas_cfc ]
+    print(*new_list, sep=', ')
 
 
 def mas_importantes(grafo,args):
@@ -229,11 +236,9 @@ def mas_importantes(grafo,args):
 def main():
     if len(sys.argv) != 2:
         print("Cantidad de parametros inválidos")
-    
+    sys.setrecursionlimit(10000)
     grafo = Grafo(True)
     netstats_crear(sys.argv[1],grafo)
-    print(grafo.vertice_pertenece("Eduardo VI de Inglaterra"))
-    print(grafo.vertice_pertenece("complejidad computacional"))
 
     for cmd in sys.stdin:
         args = cmd.split(' ')
@@ -242,7 +247,7 @@ def main():
         if comando in dicc_comandos:
             dicc_comandos[comando](grafo,argumentos)
         else:
-            print("Ingrese un comando válido para")
+            print("Ingrese un comando válido para NetStats")
             continue
 
 
@@ -258,8 +263,8 @@ dicc_comandos = {
     'navegacion': navegacion, #OK - CORRECTOR
     'lectura': lectura, #CREO OK
     #'comunidad' : comunidad,
-    'clustering' : clustering #CREO OK,
-    #'conectados': conectados
+    'clustering' : clustering, #CREO OK,
+    'conectados': conectados
 }
 
 main()
