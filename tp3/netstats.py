@@ -49,9 +49,6 @@ def camino(grafo, args):
         return None
     return _camino(grafo,args[0],args[1])
 
-
-
-
 def diametro(grafo,args):
     costo, distancias, padres, aux_origen = biblioteca.diametro(grafo)
     aux_final = list(distancias.keys())[list(distancias.values()).index(costo)]
@@ -70,10 +67,10 @@ def diametro(grafo,args):
 
 def _ciclo_n(grafo, origen, n):
     if not grafo.vertice_pertenece(origen):
-        print("No se encontro el recorrido")
+        print("No se encontro el ciclo")
         return None
     if len(grafo.adyacentes(origen)) == 0:
-        print("No se encontro el recorrido")
+        print("No se encontro el ciclo")
         return None
     sol_parcial = []
     visitados = set()
@@ -81,7 +78,8 @@ def _ciclo_n(grafo, origen, n):
     visitados.add(origen)
     ciclo = biblioteca.dfs_ciclo_largo_n(grafo,origen,origen,visitados,sol_parcial,n)
     if ciclo == None:
-        print("No se encontro el recorrido")
+        print("No se encontro el ciclo")
+        return None
     else:
         ciclo.append(origen)
         print(*ciclo, sep=' -> ')
@@ -150,8 +148,21 @@ def navegacion(grafo, args):
     print(*recorrido, sep=' -> ')
 
 
-def comunidad(grado,pagina):
-    return True
+def comunidad(grafo,pagina):
+    if len(pagina) != 1:
+        print("Ingrese una página para ejecutar 'comunidad'")
+        return None
+    aux_pag = pagina[0]
+    if not grafo.vertice_pertenece(aux_pag):
+        print("Pagina no existe en NetStats")
+        return None
+    result = biblioteca.label_propagation(grafo,aux_pag)
+    resultado = []
+    for clave in result.keys():
+        resultado.append(clave)
+    print(*resultado, sep=', ')
+    #print(len(result))
+    
 
 def clustering(grafo, args):
     if len(args) > 1:
@@ -214,9 +225,14 @@ def conectados(grafo, origen):
     visit = []
     apilados = []
     orden[pagina] = 0
-    todas_cfc =  biblioteca.cfcs_conectividad(grafo,pagina,apilados,mb,visit,cfcs,orden)
+    pila = deque()
+    todas_cfc =  biblioteca.cfcs_conectividad(grafo,pagina,apilados,mb,visit,cfcs,orden,pila)
+    todas_cfc.append(origen)
     new_list = [ seq[0] for seq in todas_cfc ]
+    #with open('out.txt','w') as f:
+    #    print(new_list, file=f )
     print(*new_list, sep=', ')
+    #print(len(new_list))
 
 
 def mas_importantes(grafo,args):
@@ -262,7 +278,7 @@ dicc_comandos = {
     'rango': rango, #OK - CORRECTOR
     'navegacion': navegacion, #OK - CORRECTOR
     'lectura': lectura, #CREO OK
-    #'comunidad' : comunidad,
+    'comunidad' : comunidad,
     'clustering' : clustering, #CREO OK,
     'conectados': conectados
 }

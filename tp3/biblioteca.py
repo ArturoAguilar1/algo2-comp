@@ -129,8 +129,7 @@ def pila_a_lista(pila):
         resul.append(pila.pop())
     return resul
 
-def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
-    pila = deque()
+def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden, pila):
     visitados.append(v)
     mb[v] = orden[v]
     pila.appendleft(v)
@@ -140,7 +139,7 @@ def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
         if w not in visitados:
         #print(f'{w} no esta visitado, lo visito')
             orden[w] = orden[v] + 1
-            cfcs_conectividad(grafo, w, apilados, mb, visitados, todas_cfc, orden)
+            cfcs_conectividad(grafo, w, apilados, mb, visitados, todas_cfc, orden, pila)
 
         if w in apilados:
             if mb[v] > mb[w]:
@@ -160,12 +159,6 @@ def cfcs_conectividad(grafo, v, apilados,mb, visitados, todas_cfc, orden):
         todas_cfc.append(nueva_cfc)
     return todas_cfc
   #print(f"Termine de trabajar con {v}")
-
-def reconstruir_camino(sol_parcial, inicio):
-    camino = []
-    camino = sol_parcial[:]
-    camino.append(inicio)
-    return camino
 
 def dfs_ciclo_largo_n(grafo, v, origen, visitados, camino_actual, n):
     visitados.add(v)
@@ -237,7 +230,7 @@ def aristas_de_entrada(grafo):
             entradas[w].append(v)
     return entradas
 
-def primeros_k(heap,k):
+def top_k(heap,k):
     resultado = []
     aux = {}
     for i in range(k):
@@ -285,4 +278,35 @@ def _mas_importantes(grafo,k):
     else:
         res = nsmallest(k,heap)
         return res
+
+def max_freq(aristas_entrada, label, v):
+    if aristas_entrada[v] == 0:
+        return label[v]
+    if len(aristas_entrada[v]) == 0:
+        return label[v]
+    aux_dicc = {}
+    max = None
+    for w in aristas_entrada[v]:
+        lab = label[w]
+        if not max:
+            max = lab
+        try:
+            aux_dicc[lab] = aux_dicc[lab] + 1
+        except KeyError:
+            aux_dicc[lab] = 1
+        if aux_dicc[lab] > aux_dicc[max]:
+            max = lab
+    return max
+
+def label_propagation(grafo, origen):
+    aristas_entrada = aristas_de_entrada(grafo)
+    label = {}
+    orden = 0
+    for v in grafo:
+        label[v] = orden
+        orden += 1
+    for _ in range(10):
+        for v in label:
+            label[v] = max_freq(aristas_entrada, label, v)
+    return label
 

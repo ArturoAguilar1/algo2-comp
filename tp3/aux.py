@@ -16,6 +16,12 @@ def dfs_ciclo_largo_n(grafo, v, origen, n, visitados, camino_actual):
         if solucion is not None:
             return solucion
     visitados.remove(v)
+
+    def reconstruir_camino(sol_parcial, inicio):
+    camino = []
+    camino = sol_parcial[:]
+    camino.append(inicio)
+    return camino
     return None"""
 '''
 # -*- coding: utf-8 -*-
